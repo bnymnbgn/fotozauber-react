@@ -1,6 +1,14 @@
 import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
 import Hero from './components/sections/Hero';
 import Gallery from './components/sections/Gallery';
+import Services from './components/sections/Services';
+import Comparison from './components/sections/Comparison';
+import About from './components/sections/About';
+import Process from './components/sections/Process';
+import Pricing from './components/sections/Pricing';
+import FAQ from './components/sections/FAQ';
+import Contact from './components/sections/Contact';
 
 function App() {
   return (
@@ -9,51 +17,23 @@ function App() {
       <main>
         <Hero />
         
-        {/* Weitere Sektionen werden hier hinzugefügt */}
-        <div id="about" className="section-padding bg-gray-50">
-          <div className="container text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Über mich - Wird implementiert</h2>
-            <p className="text-gray-600">Diese Sektion wird als nächstes entwickelt.</p>
-          </div>
-        </div>
+        <About />
         
         <Gallery />
         
-        <div id="services" className="section-padding bg-gray-50">
-          <div className="container text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Leistungen - Wird implementiert</h2>
-            <p className="text-gray-600">Diese Sektion wird als nächstes entwickelt.</p>
-          </div>
-        </div>
+        <Services />
         
-        <div id="comparison" className="section-padding">
-          <div className="container text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Vorher/Nachher - Wird implementiert</h2>
-            <p className="text-gray-600">Diese Sektion wird als nächstes entwickelt.</p>
-          </div>
-        </div>
+        <Comparison />
         
-        <div id="process" className="section-padding bg-gray-50">
-          <div className="container text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Ablauf - Wird implementiert</h2>
-            <p className="text-gray-600">Diese Sektion wird als nächstes entwickelt.</p>
-          </div>
-        </div>
+        <Process />
         
-        <div id="faq" className="section-padding">
-          <div className="container text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">FAQ - Wird implementiert</h2>
-            <p className="text-gray-600">Diese Sektion wird als nächstes entwickelt.</p>
-          </div>
-        </div>
+        <Pricing />
         
-        <div id="contact" className="section-padding bg-gray-50">
-          <div className="container text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Kontakt - Wird implementiert</h2>
-            <p className="text-gray-600">Diese Sektion wird als nächstes entwickelt.</p>
-          </div>
-        </div>
+        <FAQ />
+        
+        <Contact />
       </main>
+      <Footer />
     </div>
   );
 }

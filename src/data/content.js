@@ -195,6 +195,134 @@ export const comparisons = [
   }
 ];
 
+export const pricingPlans = [
+  {
+    id: 'basic',
+    name: 'Basic Retusche',
+    price: 25,
+    originalPrice: 35,
+    duration: '2-3 Tage',
+    popular: false,
+    description: 'Perfekt für einfache Verschönerungen und Korrekturen',
+    features: [
+      'Hautretusche & Augenaufhellung',
+      'Farbkorrektur & Belichtung',
+      'Hintergrund-Optimierung',
+      '1 Korrekturschleife',
+      'Hochauflösende Datei (300 DPI)',
+      'JPEG & PNG Format'
+    ],
+    limitations: [
+      'Keine Hintergrundersetzung',
+      'Keine komplexen Composings'
+    ],
+    icon: 'palette',
+    color: 'from-blue-500 to-blue-600',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200'
+  },
+  {
+    id: 'creative',
+    name: 'Creative Magic',
+    price: 59,
+    originalPrice: 79,
+    duration: '4-6 Tage',
+    popular: true,
+    description: 'Unsere beliebteste Wahl für magische Transformationen',
+    features: [
+      'Alles aus Basic Retusche',
+      'Kreative Hintergrundersetzung',
+      'Themen-Compositing (Weltraum, Märchen, etc.)',
+      'Objekt-Integration & Effekte',
+      '2 Korrekturschleifen',
+      'Mehrere Ausgabeformate',
+      'Social Media Versionen',
+      'Express-Option verfügbar'
+    ],
+    limitations: [],
+    icon: 'wand',
+    color: 'from-purple-500 to-pink-500',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200'
+  },
+  {
+    id: 'premium',
+    name: 'Premium Studio',
+    price: 99,
+    originalPrice: 129,
+    duration: '5-8 Tage',
+    popular: false,
+    description: 'Höchste Qualität für anspruchsvolle Kunstwerke',
+    features: [
+      'Alles aus Creative Magic',
+      'KI-unterstützte Verbesserungen',
+      'Komplexe Multi-Layer Composings',
+      'Individuelle Effekt-Erstellung',
+      'Unlimited Korrekturen',
+      'Persönlicher Bildbearbeiter',
+      'Video-Zeitraffer der Bearbeitung',
+      'Druckfertige Ausgabe (A3-A1)',
+      'Kommerzielle Lizenz'
+    ],
+    limitations: [],
+    icon: 'crown',
+    color: 'from-amber-500 to-orange-500',
+    bgColor: 'bg-amber-50',
+    borderColor: 'border-amber-200'
+  },
+  {
+    id: 'family',
+    name: 'Family Pack',
+    price: 149,
+    originalPrice: 200,
+    duration: '7-10 Tage',
+    popular: false,
+    description: 'Perfekt für Geschwister und Familienfotos',
+    features: [
+      '3-5 Bilder im Creative Magic Stil',
+      'Einheitliches Thema & Stil',
+      'Familienrabatt (25% Ersparnis)',
+      'Alle Einzelbild-Features',
+      'Gruppen-Compositing möglich',
+      'Family Album Layout',
+      'Unlimited Korrekturen',
+      'Geschenk-Verpackung'
+    ],
+    limitations: [],
+    icon: 'users',
+    color: 'from-green-500 to-teal-500',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200'
+  }
+];
+
+export const pricingAddOns = [
+  {
+    id: 'express',
+    name: '24h Express',
+    price: 30,
+    description: 'Fertigstellung in 24-48 Stunden'
+  },
+  {
+    id: 'revisions',
+    name: 'Extra Korrekturen',
+    price: 15,
+    description: 'Zusätzliche Korrekturschleifen (je 2 Runden)'
+  },
+  {
+    id: 'prints',
+    name: 'Premium Prints',
+    price: 25,
+    description: 'Professionelle Drucke auf Fotopapier'
+  },
+  {
+    id: 'video',
+    name: 'Bearbeitungs-Video',
+    price: 20,
+    description: 'Zeitraffer-Video der Transformation'
+  }
+];
+
 export const faqData = [
   {
     id: 1,

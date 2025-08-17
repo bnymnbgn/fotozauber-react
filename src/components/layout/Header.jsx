@@ -15,6 +15,7 @@ const Header = () => {
     { href: '#services', label: 'Leistungen' },
     { href: '#comparison', label: 'Vorher/Nachher' },
     { href: '#process', label: 'Ablauf' },
+    { href: '#pricing', label: 'Preise' },
     { href: '#faq', label: 'FAQ' },
     { href: '#contact', label: 'Kontakt' }
   ];
