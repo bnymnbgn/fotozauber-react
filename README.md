@@ -100,22 +100,33 @@ Verfügbare Größen: `sm`, `md`, `lg`, `xl`
 - Hero-Sektion mit Animationen
 - Button-Komponente
 - Assets-Integration
+- **Galerie-Komponente mit Lightbox & Filtering** ✨
+- **Services-Sektion mit Icon-Integration & Hover-Effekten** ✨
+- **Vergleichs-Slider (Vorher/Nachher) mit Swiper.js** ✨
+- **Kontaktformular mit File Upload & react-hook-form** ✨
+- **About-Sektion mit Testimonials & Achievements** ✨
+- **Process-Sektion mit GSAP-Animationen & 7-Step Layer-System** ✨
+- **Pricing-Sektion mit interaktiven Paketen** ✨
+- **FAQ-Sektion mit Accordion-Funktionalität** ✨
+- **Footer-Komponente mit umfassenden Links** ✨
 
 ### 🔄 In Entwicklung
-- Galerie-Komponente mit Filtering
-- Services-Sektion
-- Vergleichs-Slider (Vorher/Nachher)
-- Kontaktformular mit File Upload
-- FAQ-Sektion
-- Footer-Komponente
+- Keine aktuelle Entwicklung - Alle Hauptkomponenten fertig!
+
+### ✅ Weitere Features
+- **Testing Setup mit Vitest & React Testing Library** ✨
+  - Unit Tests für alle Komponenten
+  - Coverage Reports (70% Threshold)
+  - GitHub Actions CI/CD Pipeline
+  - Mock-Setup für GSAP, Axios, etc.
 
 ### 📋 Geplant
 - TypeScript Migration
-- Testing Setup (Vitest + Testing Library)
 - Storybook für Komponenten-Dokumentation
 - PWA Features
 - SEO Optimierung
 - Performance Monitoring
+- E2E Tests mit Playwright
 
 ## 🌐 Backend Integration
 
