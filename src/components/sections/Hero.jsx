@@ -183,7 +183,7 @@ const Hero = () => {
             />
           ))}
         </div>
-        <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-screen-xl gap-12 md:flex-row">
+        <div className="relative z-10 flex flex-col items-center pt-16 lg:pt-20 justify-center w-full max-w-screen-xl gap-12 md:flex-row">
           <div className="flex-1 max-w-lg text-center md:text-left animate-fade-in-up">
             <div className="inline-flex items-center px-4 py-2 mb-6 space-x-2 text-sm font-medium text-white/90 bg-white/10 border border-white/20 rounded-full shadow-lg backdrop-blur-sm">
               <Sparkles className="w-4 h-4 text-yellow-400" />
@@ -313,7 +313,7 @@ const Hero = () => {
           </div>
         </div>
         <div
-          className="absolute z-10 text-center transform -translate-x-1/2 cursor-pointer bottom-8 left-1/2 animate-bounce"
+          className="hidden md:block absolute z-10 text-center transform -translate-x-1/2 cursor-pointer bottom-8 left-1/2 animate-bounce"
           onClick={handleScrollToGallery}
         >
           <span className="block mb-2 text-sm text-white/70">
