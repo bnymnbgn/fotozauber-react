@@ -1,14 +1,19 @@
+// vite.config.js
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import svgr from "vite-plugin-svgr";
 
-// https://vite.dev/config/
 export default defineConfig({
   server: {
     host: "0.0.0.0",
     hmr: {
-      host: "78b4d64bb511.ngrok-free.app",
+      host: "e29548a3cb0c.ngrok-free.app",
     },
-    allowedHosts: ["78b4d64bb511.ngrok-free.app"],
+    allowedHosts: ["e29548a3cb0c.ngrok-free.app"],
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    svgr(), // Die einfache Konfiguration reicht aus
+  ],
 });
