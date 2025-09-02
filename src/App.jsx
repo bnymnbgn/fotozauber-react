@@ -1,37 +1,26 @@
+// src/App.jsx
+
+import { Routes, Route } from "react-router-dom";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
-import Hero from "./components/sections/Hero";
-import Gallery from "./components/sections/Gallery";
-import Services from "./components/sections/Services";
-import Comparison from "./components/sections/Comparison";
-import About from "./components/sections/About";
-import Process from "./components/sections/Process";
-import Pricing from "./components/sections/Pricing";
-import FAQ from "./components/sections/FAQ";
-import Contact from "./components/sections/Contact";
+import HomePage from "./pages/HomePage";
+import ImpressumPage from "./pages/ImpressumPage";
+import DatenschutzPage from "./pages/DatenschutzPage";
+import ScrollToTop from "./utils/ScrollToTop";
+import AGBPage from "./pages/AGBPage";
 
 function App() {
   return (
     <div className="min-h-screen">
       <Header />
+      <ScrollToTop />
       <main>
-        <Hero />
-
-        <About />
-
-        <Gallery />
-
-        <Services />
-
-        <Comparison />
-
-        <Process />
-
-        <Pricing />
-
-        <FAQ />
-
-        <Contact />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/impressum" element={<ImpressumPage />} />
+          <Route path="/datenschutz" element={<DatenschutzPage />} />
+          <Route path="/agb" element={<AGBPage />} />
+        </Routes>
       </main>
       <Footer />
     </div>
