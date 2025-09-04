@@ -8,9 +8,9 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     hmr: {
-      host: "e29548a3cb0c.ngrok-free.app",
+      host: "480d73aa9acb.ngrok-free.app",
     },
-    allowedHosts: ["e29548a3cb0c.ngrok-free.app"],
+    allowedHosts: ["480d73aa9acb.ngrok-free.app"],
   },
   plugins: [
     react(),

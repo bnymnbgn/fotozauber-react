@@ -1,278 +1,214 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Eye, Heart, Sparkles } from 'lucide-react';
-import { useGallery } from '../../hooks/useGallery';
-import { galleryImages } from '../../data/content';
-import Lightbox from '../features/Lightbox';
-import { cn } from '../../utils/cn';
+// src/components/sections/Gallery.jsx
 
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, X } from "lucide-react";
+import { useGallery } from "../../hooks/useGallery";
+import { galleryImages } from "../../data/content";
+import { cn } from "../../utils/cn";
+
+// ====================================================================================
+// Erweiterte Kartenansicht mit optimierten Animationen
+// ====================================================================================
+function ExpandedCard({ image, close }) {
+  const handleScroll = (e) => e.stopPropagation();
+
+  // NEU: Definierte Transition für ein flüssigeres Gefühl
+  const transition = { type: "spring", stiffness: 250, damping: 30 };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden" onClick={close}>
+      <motion.div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, transition: { duration: 0.15 } }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+      />
+      <div className="absolute inset-0 overflow-y-auto" onScroll={handleScroll}>
+        <div
+          className="container mx-auto max-w-4xl my-12"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <motion.div
+            layoutId={`card-container-${image.id}`}
+            className="bg-white rounded-2xl overflow-hidden shadow-2xl"
+            transition={transition} // NEU: Flüssige Spring-Animation
+          >
+            <div className="relative">
+              <motion.img
+                layoutId={`card-image-${image.id}`}
+                src={image.src}
+                alt={image.alt}
+                className="w-full h-auto max-h-[70vh] object-cover cursor-pointer"
+                onClick={close}
+                transition={transition} // NEU: Flüssige Spring-Animation
+              />
+              <motion.button
+                onClick={close}
+                className="absolute top-4 right-4 bg-white/70 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-all"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1, transition: { delay: 0.3 } }}
+                exit={{ scale: 0, opacity: 0 }}
+              >
+                <X className="w-6 h-6 text-gray-800" />
+              </motion.button>
+            </div>
+            <motion.div
+              className="p-8"
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: 1,
+                transition: { delay: 0.2, duration: 0.3 },
+              }}
+              exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            >
+              <motion.h2
+                layoutId={`card-title-${image.id}`}
+                transition={transition}
+                className="text-3xl font-bold text-gray-900"
+              >
+                {image.title}
+              </motion.h2>
+              <motion.p
+                layoutId={`card-category-${image.id}`}
+                transition={transition}
+                className="text-purple-600 font-medium mt-1"
+              >
+                {image.transformation}
+              </motion.p>
+              <div className="w-16 h-1 bg-purple-200 my-6"></div>
+              <p className="text-gray-700 leading-relaxed">
+                {image.description} Lorem ipsum dolor sit amet, consectetur
+                adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                consequat.
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ====================================================================================
+// Vorschau-Karte
+// ====================================================================================
+function Card({ image, onSelect, className }) {
+  return (
+    <motion.div
+      layoutId={`card-container-${image.id}`}
+      onClick={() => onSelect(image.id)}
+      className={cn(
+        "group relative cursor-pointer bg-white overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300",
+        className
+      )}
+    >
+      <motion.img
+        layoutId={`card-image-${image.id}`}
+        src={image.src}
+        alt={image.alt}
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
+        <motion.h3
+          layoutId={`card-title-${image.id}`}
+          className="text-white font-semibold text-lg"
+        >
+          {image.title}
+        </motion.h3>
+        <motion.p
+          layoutId={`card-category-${image.id}`}
+          className="text-white/80 text-sm"
+        >
+          {image.transformation}
+        </motion.p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ====================================================================================
+// Haupt-Galerie-Komponente
+// ====================================================================================
 const Gallery = () => {
-  const {
-    activeFilter,
-    setActiveFilter,
-    filteredImages,
-    categories,
-    isLightboxOpen,
-    currentImageIndex,
-    openLightbox,
-    closeLightbox,
-    goToNextImage,
-    goToPrevImage,
-    currentImage
-  } = useGallery(galleryImages);
+  const { activeFilter, setActiveFilter, filteredImages, categories } =
+    useGallery(galleryImages);
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 20,
-      scale: 0.9 
-    },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.8,
-      transition: {
-        duration: 0.3
-      }
-    }
-  };
-
-  const getCategoryColor = (category) => {
-    const colors = {
-      space: 'from-purple-500 to-blue-500',
-      underwater: 'from-blue-500 to-teal-500',
-      animals: 'from-green-500 to-yellow-500',
-      fantasy: 'from-pink-500 to-purple-500',
-      surprise: 'from-orange-500 to-red-500'
-    };
-    return colors[category] || 'from-gray-500 to-gray-600';
-  };
+  const [selectedId, setSelectedId] = useState(null);
+  const selectedImage = selectedId
+    ? galleryImages.find((img) => img.id === selectedId)
+    : null;
 
   return (
     <section id="gallery" className="section-padding bg-gray-50">
       <div className="container">
-        {/* Section Header */}
-        <motion.div 
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
+        {/* Header und Filter */}
+        <div className="text-center mb-16">
           <div className="inline-flex items-center space-x-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Sparkles className="w-4 h-4" />
             <span>Unsere Kunstwerke</span>
           </div>
-          
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Galerie magischer{' '}
+            Galerie magischer{" "}
             <span className="text-gradient">Transformationen</span>
           </h2>
-          
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Entdecken Sie eine Auswahl unserer schönsten Bildbearbeitungen. 
-            Jedes Foto erzählt eine einzigartige Geschichte voller Magie und Fantasie.
+            Entdecken Sie eine Auswahl unserer schönsten Bildbearbeitungen.
           </p>
-        </motion.div>
-
-        {/* Filter Buttons */}
-        <motion.div 
-          className="flex flex-wrap justify-center gap-3 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+        </div>
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
           {categories.map((category) => (
-            <motion.button
+            <button
               key={category.id}
               onClick={() => setActiveFilter(category.id)}
               className={cn(
-                'px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 relative overflow-hidden',
+                "px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 relative",
                 activeFilter === category.id
-                  ? 'bg-gradient-primary text-white shadow-lg scale-105'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200 hover:border-primary-300'
+                  ? "bg-gradient-primary text-white shadow-lg"
+                  : "bg-white text-gray-700 hover:bg-gray-100"
               )}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.95 }}
             >
-              <span className="relative z-10 flex items-center gap-2">
-                {category.name}
-                <span className={cn(
-                  'text-xs px-2 py-1 rounded-full',
-                  activeFilter === category.id
-                    ? 'bg-white/20 text-white'
-                    : 'bg-gray-100 text-gray-600'
-                )}>
-                  {category.count}
-                </span>
-              </span>
-              
-              {activeFilter === category.id && (
-                <motion.div
-                  className="absolute inset-0 bg-gradient-primary"
-                  layoutId="activeFilter"
-                  initial={false}
-                  transition={{ duration: 0.3 }}
-                />
-              )}
-            </motion.button>
+              {category.name}
+            </button>
           ))}
-        </motion.div>
+        </div>
 
-        {/* Results Count */}
-        <motion.div 
-          className="text-center mb-8"
-          key={activeFilter}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <p className="text-gray-600">
-            <span className="font-semibold text-primary-600">{filteredImages.length}</span> 
-            {activeFilter === 'all' ? ' magische Transformationen' : ` Bilder in "${categories.find(c => c.id === activeFilter)?.name}"`}
-          </p>
-        </motion.div>
-
-        {/* Image Grid */}
-        <motion.div 
+        {/* Asymmetrisches Grid Layout */}
+        <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[250px]"
         >
-          <AnimatePresence mode="popLayout">
-            {filteredImages.map((image, index) => (
-              <motion.div
+          {filteredImages.map((image, index) => {
+            let className = "";
+            if ((index + 1) % 5 === 0) {
+              className = "col-span-2 row-span-2";
+            } else if ((index + 1) % 7 === 0) {
+              className = "col-span-2";
+            }
+            return (
+              <Card
                 key={image.id}
-                layout
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="group relative cursor-pointer"
-                onClick={() => openLightbox(index)}
-              >
-                {/* Image Container */}
-                <div className="relative overflow-hidden rounded-xl bg-white shadow-md group-hover:shadow-xl transition-shadow duration-300">
-                  {/* Image */}
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={image.src}
-                      alt={image.alt}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  {/* Overlay */}
-                  <motion.div 
-                    className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    initial={false}
-                  >
-                    {/* Category Badge */}
-                    <div className="absolute top-3 left-3">
-                      <span className={cn(
-                        'px-3 py-1 text-xs font-medium text-white rounded-full bg-gradient-to-r',
-                        getCategoryColor(image.category)
-                      )}>
-                        {categories.find(c => c.id === image.category)?.name}
-                      </span>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="absolute top-3 right-3">
-                      <motion.div
-                        className="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </motion.div>
-                    </div>
-
-                    {/* Image Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <motion.div
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.1 }}
-                      >
-                        <h3 className="text-white font-semibold text-lg mb-1 truncate">
-                          {image.title}
-                        </h3>
-                        <p className="text-white/80 text-sm mb-2 line-clamp-2">
-                          {image.description}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-white/60 text-xs">
-                            {image.transformation}
-                          </span>
-                          <div className="flex items-center space-x-2">
-                            <Heart className="w-4 h-4 text-white/60" />
-                            <Search className="w-4 h-4 text-white/60" />
-                          </div>
-                        </div>
-                      </motion.div>
-                    </div>
-                  </motion.div>
-
-                  {/* Hover Border Effect */}
-                  <div className="absolute inset-0 border-2 border-transparent group-hover:border-primary-400 rounded-xl transition-colors duration-300" />
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                image={image}
+                onSelect={setSelectedId}
+                className={className}
+              />
+            );
+          })}
         </motion.div>
-
-        {/* Empty State */}
-        {filteredImages.length === 0 && (
-          <motion.div 
-            className="text-center py-16"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              Keine Bilder gefunden
-            </h3>
-            <p className="text-gray-500">
-              Versuchen Sie einen anderen Filter oder schauen Sie sich alle Bilder an.
-            </p>
-          </motion.div>
-        )}
       </div>
 
-      {/* Lightbox */}
-      <Lightbox
-        isOpen={isLightboxOpen}
-        onClose={closeLightbox}
-        image={currentImage}
-        onNext={goToNextImage}
-        onPrev={goToPrevImage}
-        currentIndex={currentImageIndex}
-        totalImages={filteredImages.length}
-      />
+      {/* Erweiterte Kartenansicht */}
+      <AnimatePresence>
+        {selectedId && selectedImage && (
+          <ExpandedCard
+            image={selectedImage}
+            close={() => setSelectedId(null)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   );
 };
