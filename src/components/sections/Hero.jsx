@@ -1,44 +1,49 @@
 import { ArrowRight, Sparkles } from "lucide-react";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagicCircleCard from "../ui/MagicCircleCard";
 import ComparisonSlider from "../ui/ComparisonSlider";
 
 // Debugging: Bestätigen, dass Hero.jsx geladen wird
-console.log("Hero.jsx: Using MagicCircleCard without overlay");
+console.log(
+  "Hero.jsx: Using MagicCircleCard with endless cycle and collision avoidance"
+);
 
 // Deine Beispielbilder
 const transformationExamples = [
   {
-    before: "/assets/img/Halid 1.1.jpg",
-    after: "/assets/img/Halid 1.jpg",
+    before: "/assets/img/Halid before.jpg",
+    after: "/assets/img/Halid after.jpg",
     alt: "Kind in Phantasiewelt",
   },
   {
-    before: "/assets/img/bebe.jpg",
-    after: "/assets/img/bebe1.jpg",
+    before: "/assets/img/before.jpg",
+    after: "/assets/img/after.jpg",
     alt: "Kind in Phantasiewelt",
   },
   {
-    before: "/assets/img/TIGER Kopie2.jpg",
-    after: "/assets/img/TIGER Kopie2.jpg",
+    before: "/assets/img/bebe before.jpg",
+    after: "/assets/img/bebe after.jpg",
+    alt: "Kind in Phantasiewelt",
+  },
+  {
+    before: "/assets/img/TIGER before.jpg",
+    after: "/assets/img/TIGER after.jpg",
     alt: "Kind mit Tiger",
   },
   {
-    before: "/assets/img/randombebe.jpg",
-    after: "/assets/img/randombebe Kopie.jpg",
+    before: "/assets/img/randombebe before.jpg",
+    after: "/assets/img/randombebe after.jpg",
     alt: "Baby mit Sternen",
   },
   {
-    before: "/assets/img/klem 1.jpg",
-    after: "/assets/img/klem 1.jpg",
+    before: "/assets/img/klem before.jpg",
+    after: "/assets/img/klem after.jpg",
     alt: "Kind als Kapitän",
   },
   {
-    before:
-      "/assets/img/big-elephant-eating-and-starring-at-the-camera-2023-11-27-04-46-04-utc Kopie.jpg",
-    after:
-      "/assets/img/big-elephant-eating-and-starring-at-the-camera-2023-11-27-04-46-04-utc Kopie.jpg",
+    before: "/assets/img/ele before.jpg",
+    after: "/assets/img/ele after.jpg",
     alt: "Kind mit Elefant",
   },
 ];
@@ -77,13 +82,284 @@ const Lightbox = ({ isOpen, onClose, children }) => (
   </AnimatePresence>
 );
 
+// Spatial Grid Klasse für Kollisionsvermeidung
+class SpatialGrid {
+  constructor(width, height, cellSize = 250) {
+    this.width = width;
+    this.height = height;
+    this.cellSize = cellSize;
+    this.cols = Math.ceil(width / cellSize);
+    this.rows = Math.ceil(height / cellSize);
+    this.grid = new Map();
+    this.occupiedCells = new Set();
+
+    // Karten-Dimensionen (aus MagicCircleCard)
+    this.cardWidth = 230;
+    this.cardHeight = 275;
+
+    // Aktive Timeouts verfolgen
+    this.activeTimeouts = new Map();
+  }
+
+  // Zelle für gegebene Koordinaten berechnen
+  getCell(x, y) {
+    const col = Math.floor(x / this.cellSize);
+    const row = Math.floor(y / this.cellSize);
+    return `${col},${row}`;
+  }
+
+  // Alle Zellen ermitteln, die eine Karte belegt
+  getCellsForCard(x, y) {
+    const cells = [];
+    const leftCol = Math.floor(x / this.cellSize);
+    const rightCol = Math.floor((x + this.cardWidth) / this.cellSize);
+    const topRow = Math.floor(y / this.cellSize);
+    const bottomRow = Math.floor((y + this.cardHeight) / this.cellSize);
+
+    for (let col = leftCol; col <= rightCol; col++) {
+      for (let row = topRow; row <= bottomRow; row++) {
+        if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {
+          cells.push(`${col},${row}`);
+        }
+      }
+    }
+    return cells;
+  }
+
+  // Prüfen ob Position frei ist
+  isPositionFree(x, y) {
+    const cells = this.getCellsForCard(x, y);
+    return cells.every((cell) => !this.occupiedCells.has(cell));
+  }
+
+  // Position reservieren mit automatischer Freigabe
+  occupyPosition(x, y, cardId, duration) {
+    const cells = this.getCellsForCard(x, y);
+    cells.forEach((cell) => {
+      this.occupiedCells.add(cell);
+      if (!this.grid.has(cell)) {
+        this.grid.set(cell, new Set());
+      }
+      this.grid.get(cell).add(cardId);
+    });
+
+    // Timer für automatische Freigabe
+    if (duration && duration > 0) {
+      const timeoutId = setTimeout(() => {
+        this.freePosition(cardId, cells);
+        this.activeTimeouts.delete(cardId);
+      }, duration);
+
+      this.activeTimeouts.set(cardId, timeoutId);
+    }
+
+    return cells;
+  }
+
+  // Position freigeben
+  freePosition(cardId, cells) {
+    // Timeout löschen falls vorhanden
+    if (this.activeTimeouts.has(cardId)) {
+      clearTimeout(this.activeTimeouts.get(cardId));
+      this.activeTimeouts.delete(cardId);
+    }
+
+    if (cells) {
+      cells.forEach((cell) => {
+        if (this.grid.has(cell)) {
+          this.grid.get(cell).delete(cardId);
+          if (this.grid.get(cell).size === 0) {
+            this.grid.delete(cell);
+            this.occupiedCells.delete(cell);
+          }
+        }
+      });
+    }
+  }
+
+  // Freie Position in bestimmtem Bereich finden
+  findFreePosition(attempts = 50) {
+    for (let i = 0; i < attempts; i++) {
+      // Position mit Bias zu vertikaler Verteilung
+      const x = Math.random() * (this.width - this.cardWidth);
+      const y = Math.random() * (this.height * 0.8); // Nur untere 80% nutzen
+
+      if (this.isPositionFree(x, y)) {
+        return { x, y };
+      }
+    }
+
+    // Fallback: Suche systematisch
+    for (let row = 0; row < this.rows; row++) {
+      for (let col = 0; col < this.cols; col++) {
+        const x =
+          col * this.cellSize +
+          Math.random() * (this.cellSize - this.cardWidth);
+        const y =
+          row * this.cellSize +
+          Math.random() * (this.cellSize - this.cardHeight);
+
+        if (
+          x + this.cardWidth <= this.width &&
+          y + this.cardHeight <= this.height * 0.8 &&
+          this.isPositionFree(x, y)
+        ) {
+          return { x, y };
+        }
+      }
+    }
+
+    // Letzter Fallback: Zufällige Position (kann überlappen)
+    return {
+      x: Math.random() * (this.width - this.cardWidth),
+      y: Math.random() * (this.height * 0.8),
+    };
+  }
+
+  // Grid zurücksetzen und alle Timeouts löschen
+  clear() {
+    this.activeTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+    this.activeTimeouts.clear();
+    this.grid.clear();
+    this.occupiedCells.clear();
+  }
+
+  // Debug-Info
+  getDebugInfo() {
+    return {
+      occupiedCells: this.occupiedCells.size,
+      totalCells: this.cols * this.rows,
+      occupancyRate:
+        ((this.occupiedCells.size / (this.cols * this.rows)) * 100).toFixed(1) +
+        "%",
+      activeTimeouts: this.activeTimeouts.size,
+    };
+  }
+}
+
 const Hero = () => {
   const [particles, setParticles] = useState([]);
   const [glowPosition, setGlowPosition] = useState({ x: 0, y: 0 });
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentLightboxIndex, setCurrentLightboxIndex] = useState(0);
   const [flowingCards, setFlowingCards] = useState([]);
+  const [spatialGrid, setSpatialGrid] = useState(null);
 
+  // Refs für bessere Cleanup-Verwaltung
+  const intervalsRef = useRef(new Set());
+  const timeoutsRef = useRef(new Set());
+  const mountedRef = useRef(true);
+
+  // Cleanup Helper
+  const clearAllTimeouts = useCallback(() => {
+    timeoutsRef.current.forEach((id) => clearTimeout(id));
+    timeoutsRef.current.clear();
+    intervalsRef.current.forEach((id) => clearInterval(id));
+    intervalsRef.current.clear();
+  }, []);
+
+  // Spatial Grid initialisieren
+  useEffect(() => {
+    const grid = new SpatialGrid(window.innerWidth, window.innerHeight, 280);
+    setSpatialGrid(grid);
+
+    const handleResize = () => {
+      if (mountedRef.current) {
+        const newGrid = new SpatialGrid(
+          window.innerWidth,
+          window.innerHeight,
+          280
+        );
+        setSpatialGrid(newGrid);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      grid.clear();
+    };
+  }, []);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearAllTimeouts();
+      if (spatialGrid) {
+        spatialGrid.clear();
+      }
+    };
+  }, [clearAllTimeouts, spatialGrid]);
+
+  // Funktion zum Generieren der Timing-Parameter (unverändert)
+  const generateTimingParameters = useCallback(() => {
+    const popInDuration = 0.5;
+    const initialDelay = Math.random() * 2;
+    const flowDuration = 12 + Math.random() * 8;
+    const delayAfterPopIn = 1500 + Math.random() * 1000;
+    const fadeOutDuration = 1;
+    const additionalFlowTime = 4;
+
+    const totalTransformationDelay =
+      initialDelay * 1000 + popInDuration * 1000 + delayAfterPopIn;
+    const totalCycleTime =
+      (initialDelay +
+        popInDuration +
+        flowDuration * 0.3 +
+        additionalFlowTime +
+        fadeOutDuration) *
+      1000;
+
+    return {
+      popInDuration,
+      initialDelay,
+      flowDuration,
+      delayAfterPopIn,
+      fadeOutDuration,
+      additionalFlowTime,
+      totalTransformationDelay,
+      totalCycleTime,
+    };
+  }, []);
+
+  // Funktion zum Erstellen einer neuen Karte mit Kollisionsvermeidung
+  const createNewCard = useCallback(
+    (index, grid) => {
+      if (!grid || !mountedRef.current) return null;
+
+      const timing = generateTimingParameters();
+      const cardId = `card-${index}-${Date.now()}-${Math.random()}`;
+
+      // Freie Position finden und reservieren
+      const position = grid.findFreePosition();
+      grid.occupyPosition(
+        position.x,
+        position.y,
+        cardId,
+        timing.totalCycleTime
+      );
+
+      const animationString = `endless-cycle ${timing.flowDuration}s linear ${timing.initialDelay}s infinite`;
+
+      return {
+        key: cardId,
+        style: {
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          animation: animationString,
+        },
+        transformationDelay: timing.totalTransformationDelay,
+        cycleTime: timing.totalCycleTime,
+        index,
+        cardId,
+      };
+    },
+    [generateTimingParameters]
+  );
+
+  // Mouse Move Effect (unverändert)
   useEffect(() => {
     const handleMouseMove = (e) => {
       const { clientX, clientY, currentTarget } = e;
@@ -101,6 +377,7 @@ const Hero = () => {
     };
   }, []);
 
+  // Partikel Setup (unverändert)
   useEffect(() => {
     const numParticles = 120;
     const newParticles = Array.from({ length: numParticles }).map(() => ({
@@ -113,47 +390,66 @@ const Hero = () => {
     setParticles(newParticles);
   }, []);
 
+  // Initialisierung und endloser Zyklus der fließenden Karten
   useEffect(() => {
-    const numberOfLanes = 6;
-    const laneWidth = 100 / numberOfLanes;
+    if (!spatialGrid || !mountedRef.current) return;
 
-    const newFlowingCards = transformationExamples.map((_, index) => {
-      const laneIndex = index % numberOfLanes;
-      const leftPosition =
-        laneIndex * laneWidth + Math.random() * (laneWidth / 4);
+    // Alle vorherigen Timeouts löschen
+    clearAllTimeouts();
 
-      // --- HIER IST DIE NEUE LOGIK ---
+    // Initiale Karten erstellen
+    const initialCards = transformationExamples
+      .map((_, index) => createNewCard(index, spatialGrid))
+      .filter(Boolean);
 
-      const popInDuration = 0.5; // Dauer des Aufpoppens in Sekunden
-      const initialDelay = Math.random() * 10; // Zufällige Startverzögerung
-      const floatDuration = 20 + Math.random() * 15;
+    if (mountedRef.current) {
+      setFlowingCards(initialCards);
+    }
 
-      // NEU: Definiere, wie lange nach dem Aufpoppen gewartet werden soll
-      // (z.B. zwischen 2 und 4 Sekunden)
-      const delayAfterPopIn = 2000 + Math.random() * 2000; // in Millisekunden
+    // Endlos-Zyklus Setup mit gestaffelten Starts
+    initialCards.forEach((card, idx) => {
+      const timeoutId = setTimeout(() => {
+        if (!mountedRef.current) return;
 
-      // NEU: Gesamtverzögerung für die Transformation berechnen
-      // (Startverzögerung + Dauer des Aufpoppens + die neue Wartezeit)
-      const totalTransformationDelay =
-        initialDelay * 1000 + popInDuration * 1000 + delayAfterPopIn;
+        // Starte den endlosen Zyklus für diese Karte
+        const intervalId = setInterval(() => {
+          if (!mountedRef.current) return;
 
-      const animationString = `pop-in ${popInDuration}s ease-out ${initialDelay}s forwards, flow-up ${floatDuration}s linear ${
-        initialDelay + popInDuration
-      }s infinite`;
+          const newCard = createNewCard(card.index, spatialGrid);
+          if (newCard && mountedRef.current) {
+            setFlowingCards((prevCards) =>
+              prevCards.map((prevCard) =>
+                prevCard.index === card.index ? newCard : prevCard
+              )
+            );
+          }
+        }, card.cycleTime);
 
-      // Wir fügen die neue Gesamtverzögerung zum Objekt hinzu
-      return {
-        style: {
-          left: `${leftPosition}%`,
-          top: `${Math.random() * 80}%`,
-          animation: animationString,
-        },
-        // Wir speichern den Wert, um ihn unten im JSX zu verwenden
-        transformationDelay: totalTransformationDelay,
-      };
+        intervalsRef.current.add(intervalId);
+      }, card.cycleTime + idx * 1000);
+
+      timeoutsRef.current.add(timeoutId);
     });
-    setFlowingCards(newFlowingCards);
-  }, []);
+
+    // Cleanup function
+    return () => {
+      clearAllTimeouts();
+    };
+  }, [spatialGrid, createNewCard, clearAllTimeouts]);
+
+  // Debug-Logging (optional, entfernbar in Produktion)
+  useEffect(() => {
+    if (!spatialGrid) return;
+
+    const interval = setInterval(() => {
+      if (spatialGrid && mountedRef.current) {
+        console.log("Spatial Grid Status:", spatialGrid.getDebugInfo());
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [spatialGrid]);
+
   const handleScrollToContact = () =>
     document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
   const openLightbox = (index) => {
@@ -183,34 +479,38 @@ const Hero = () => {
           animation-timing-function: ease-in-out; 
           animation-iteration-count: infinite; 
         }
-        @keyframes pop-in {
-          from {
-            opacity: 0;
-            transform: scale(0.5);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
 
-        /* Animation 2: Das unendliche Schweben danach */
-        @keyframes flow-up {
-          from {
-            /* Startet mit dem Ergebnis von pop-in */
+        /* Endloser Zyklus Animation */
+        @keyframes endless-cycle {
+          /* Pop-in Phase (0-6%) */
+          0% {
+            opacity: 0;
+            transform: scale(0.5) translateY(0);
+          }
+          6% {
+            opacity: 1;
             transform: scale(1) translateY(0);
           }
-          to {
-            /* Behält die Größe bei und schwebt nach oben */
-            transform: scale(1) translateY(-100vh);
+          
+          /* Flow-up Phase (6-80%) */
+          80% {
+            opacity: 1;
+            transform: scale(1) translateY(-50vh);
+          }
+          
+          /* Additional flow + fade-out (80-100%) */
+          95% {
+            opacity: 1;
+            transform: scale(1) translateY(-70vh);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1) translateY(-75vh);
           }
         }
 
         .flowing-card {
-          /* Die Animation wird jetzt per Inline-Style aus dem JS gesetzt, */
-          /* damit jede Karte ihre eigene zufällige Dauer/Verzögerung hat. */
-          /* Wichtig: Wir setzen hier eine initiale Unsichtbarkeit, */
-          /* damit die Karte vor dem Start der Animation nicht einfach da ist. */
+          /* Initiale Unsichtbarkeit vor Animation */
           opacity: 0;
         }
       `}</style>
@@ -247,18 +547,19 @@ const Hero = () => {
 
         {/* EBENE 2: FLIESSENDE BILDER */}
         <div className="absolute inset-0 z-20">
-          {flowingCards.map((card, index) => (
+          {flowingCards.map((card) => (
             <div
-              key={`card-${index}`}
+              key={card.key}
               className="flowing-card absolute"
               style={card.style}
             >
               <MagicCircleCard
-                beforeSrc={transformationExamples[index].before}
-                afterSrc={transformationExamples[index].after}
-                onClick={() => openLightbox(index)}
-                // NEU: Die berechnete Verzögerung als Prop übergeben
+                key={card.key} // Neu hinzugefügt: Force remount für jeden Zyklus
+                beforeSrc={transformationExamples[card.index].before}
+                afterSrc={transformationExamples[card.index].after}
+                onClick={() => openLightbox(card.index)}
                 transformationDelay={card.transformationDelay}
+                // resetKey={card.resetKey}  // Entfernen: Nicht benötigt und undefiniert
               />
             </div>
           ))}
