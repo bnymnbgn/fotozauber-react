@@ -23,6 +23,21 @@ const transformationExamples = [
     alt: "Kind in Phantasiewelt",
   },
   {
+    before: "/assets/img/before1.jpg",
+    after: "/assets/img/after1.jpg",
+    alt: "Kind in Phantasiewelt",
+  },
+  {
+    before: "/assets/img/before2.png",
+    after: "/assets/img/after2.JPG",
+    alt: "Kind in Phantasiewelt",
+  },
+  {
+    before: "/assets/img/before3.jpg",
+    after: "/assets/img/after3.png",
+    alt: "Kind in Phantasiewelt",
+  },
+  {
     before: "/assets/img/before.jpg",
     after: "/assets/img/after.jpg",
     alt: "Kind in Phantasiewelt",
@@ -88,7 +103,7 @@ const Lightbox = ({ isOpen, onClose, children }) => (
   </AnimatePresence>
 );
 
-// Spatial Grid Klasse für Kollisionsvermeidung
+// KORRIGIERTE Spatial Grid Klasse für Kollisionsvermeidung und zufällige Lane-Wahl
 class EnhancedSpatialGrid {
   constructor(width, height, cardWidth = 230, cardHeight = 275) {
     this.width = width;
@@ -96,8 +111,7 @@ class EnhancedSpatialGrid {
     this.cardWidth = cardWidth;
     this.cardHeight = cardHeight;
 
-    // Lane-System Setup
-    this.laneWidth = cardWidth + 50; // 50px Puffer zwischen Lanes
+    this.laneWidth = cardWidth + 50;
     this.numLanes = Math.floor(width / this.laneWidth);
     this.lanes = Array.from({ length: this.numLanes }, (_, i) => ({
       id: i,
@@ -107,25 +121,30 @@ class EnhancedSpatialGrid {
     }));
 
     this.minVerticalGap = cardHeight + 100;
-    this.minTimingGap = 2000; // 2 Sekunden zwischen Starts in derselben Lane
+    this.minTimingGap = 2000;
     this.activeTimeouts = new Map();
-
-    console.log(`EnhancedSpatialGrid: ${this.numLanes} lanes initialized`);
   }
 
   findBestLane(currentTime = Date.now()) {
-    return this.lanes
-      .map((lane) => ({
-        ...lane,
-        waitTime: Math.max(0, lane.nextAvailableTime - currentTime),
-        activeCardsCount: lane.activeCards.size,
-      }))
-      .sort((a, b) => {
-        if (a.activeCardsCount !== b.activeCardsCount) {
-          return a.activeCardsCount - b.activeCardsCount;
-        }
-        return a.waitTime - b.waitTime;
-      })[0];
+    const laneStats = this.lanes.map((lane) => ({
+      ...lane,
+      waitTime: Math.max(0, lane.nextAvailableTime - currentTime),
+      activeCardsCount: lane.activeCards.size,
+    }));
+
+    const minActiveCards = Math.min(
+      ...laneStats.map((l) => l.activeCardsCount)
+    );
+    const lanesWithMinCards = laneStats.filter(
+      (l) => l.activeCardsCount === minActiveCards
+    );
+
+    const minWaitTime = Math.min(...lanesWithMinCards.map((l) => l.waitTime));
+    const bestLanes = lanesWithMinCards.filter(
+      (l) => l.waitTime === minWaitTime
+    );
+
+    return bestLanes[Math.floor(Math.random() * bestLanes.length)];
   }
 
   calculateSafeYPosition(lane, currentTime = Date.now()) {
@@ -137,17 +156,14 @@ class EnhancedSpatialGrid {
       return Math.random() * (this.height - this.cardHeight);
     }
 
-    // Versuche sichere Position zu finden
     for (let attempt = 0; attempt < 10; attempt++) {
       const candidateY = Math.random() * (this.height - this.cardHeight);
       const isSafe = activeCards.every(
         (card) => Math.abs(candidateY - card.y) > this.minVerticalGap
       );
-
       if (isSafe) return candidateY;
     }
-
-    return Math.random() * (this.height - this.cardHeight); // Fallback
+    return Math.random() * (this.height - this.cardHeight);
   }
 
   reservePosition(cardId, duration, timing) {
@@ -158,7 +174,7 @@ class EnhancedSpatialGrid {
     const safeY = this.calculateSafeYPosition(bestLane, startTime);
 
     const cardInfo = {
-      startTime: startTime + timing.initialDelay * 1000,
+      startTime: startTime + (timing.initialDelay || 0) * 1000,
       duration: duration,
       y: safeY,
     };
@@ -174,11 +190,13 @@ class EnhancedSpatialGrid {
 
     this.activeTimeouts.set(cardId, timeoutId);
 
+    const actualStartDelay = (startTime - currentTime) / 1000;
+
     return {
       x: bestLane.x,
       y: safeY,
       laneId: bestLane.id,
-      actualStartDelay: (startTime - currentTime) / 1000,
+      actualStartDelay,
     };
   }
 
@@ -187,7 +205,6 @@ class EnhancedSpatialGrid {
       clearTimeout(this.activeTimeouts.get(cardId));
       this.activeTimeouts.delete(cardId);
     }
-
     this.lanes.forEach((lane) => {
       if (lane.activeCards.has(cardId)) {
         lane.activeCards.delete(cardId);
@@ -217,7 +234,6 @@ class EnhancedSpatialGrid {
           ? `${Math.ceil((lane.nextAvailableTime - Date.now()) / 1000)}s`
           : "available",
     }));
-
     return {
       totalActiveCards,
       totalLanes: this.numLanes,
@@ -235,23 +251,71 @@ const Hero = () => {
   const [flowingCards, setFlowingCards] = useState([]);
   const [spatialGrid, setSpatialGrid] = useState(null);
 
-  const intervalsRef = useRef(new Set());
   const timeoutsRef = useRef(new Set());
   const mountedRef = useRef(true);
-  const flowingCardsRefs = useRef([]);
 
-  // Cleanup Helper
   const clearAllTimeouts = useCallback(() => {
     timeoutsRef.current.forEach((id) => clearTimeout(id));
     timeoutsRef.current.clear();
-    intervalsRef.current.forEach((id) => clearInterval(id));
-    intervalsRef.current.clear();
   }, []);
 
-  // Initialize Spatial Grid
+  // ANGEPASSTE generateTimingParameters Funktion
+  const generateTimingParameters = useCallback(() => {
+    const beforeImageFlowDuration = 3;
+    const afterImageFlowDuration = 5 + Math.random() * 10;
+    const totalTransformationDelay = beforeImageFlowDuration * 1000;
+    const totalCycleTime =
+      (beforeImageFlowDuration + afterImageFlowDuration) * 1000;
+    const animationDuration = totalCycleTime / 1000;
+
+    return {
+      totalTransformationDelay,
+      totalCycleTime,
+      animationDuration,
+    };
+  }, []);
+
+  const createNewCard = useCallback(
+    (index, grid, initialStartDelay = 0) => {
+      // Neuer Parameter: initialStartDelay
+      if (!grid || !grid.reservePosition) return null;
+
+      const timing = generateTimingParameters();
+      const cardId = `card-${index}-${Date.now()}-${Math.random()}`;
+
+      // Übergibt initialStartDelay an reservePosition
+      const position = grid.reservePosition(cardId, timing.totalCycleTime, {
+        initialDelay: initialStartDelay / 1000, // In Sekunden umwandeln
+      });
+
+      // Die eigentliche Animation der Karte beginnt jetzt nach dieser initialen Verzögerung
+      const animationString = `endless-cycle ${
+        timing.animationDuration
+      }s linear ${initialStartDelay / 1000}s infinite`;
+
+      return {
+        key: cardId,
+        style: {
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          animation: animationString,
+        },
+        // Wichtig: Die Transformation verzögert sich ebenfalls um den initialen StartDelay
+        transformationDelay:
+          timing.totalTransformationDelay + initialStartDelay,
+        cycleTime: timing.totalCycleTime,
+        // Speichern der initialen Verzögerung, falls im Scheduler benötigt
+        initialStartDelay: initialStartDelay,
+        index,
+        cardId,
+      };
+    },
+    [generateTimingParameters]
+  );
+
   useEffect(() => {
+    mountedRef.current = true;
     const grid = new EnhancedSpatialGrid(window.innerWidth, window.innerHeight);
-    console.log("SpatialGrid initialized:", grid);
     setSpatialGrid(grid);
 
     const handleResize = () => {
@@ -263,95 +327,16 @@ const Hero = () => {
         setSpatialGrid(newGrid);
       }
     };
-
     window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      grid.clear();
-    };
-  }, []);
 
-  // Initialize flowingCardsRefs
-  useEffect(() => {
-    flowingCardsRefs.current = transformationExamples.map(() => createRef());
-  }, []);
-
-  // Mounted Ref and clearAllTimeouts on unmount
-  useEffect(() => {
-    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
+      window.removeEventListener("resize", handleResize);
+      grid.clear();
       clearAllTimeouts();
     };
   }, [clearAllTimeouts]);
 
-  // Generate Timing Parameters
-  const generateTimingParameters = useCallback(() => {
-    const popInDuration = 0.5;
-    const initialDelay = Math.random() * 2;
-    const delayAfterPopIn = 1500 + Math.random() * 1000;
-    const fadeOutDuration = 1;
-    const holdAfterTransform = 3;
-
-    const totalTransformationDelay =
-      initialDelay * 1000 + popInDuration * 1000 + delayAfterPopIn;
-    const totalCycleTime =
-      totalTransformationDelay +
-      holdAfterTransform * 1000 +
-      fadeOutDuration * 1000;
-    const animationDuration = totalCycleTime / 1000;
-
-    return {
-      popInDuration,
-      initialDelay,
-      delayAfterPopIn,
-      fadeOutDuration,
-      totalTransformationDelay,
-      totalCycleTime,
-      animationDuration,
-    };
-  }, []);
-
-  // Create New Card
-  const createNewCard = useCallback(
-    (index, grid) => {
-      if (!grid || !mountedRef.current || !grid.reservePosition) {
-        console.warn("createNewCard: Grid is not initialized or invalid");
-        return null;
-      }
-      const timing = generateTimingParameters();
-      const cardId = `card-${index}-${Date.now()}-${Math.random()}`;
-      const position = grid.reservePosition(
-        cardId,
-        timing.totalCycleTime,
-        timing
-      );
-
-      const adjustedInitialDelay =
-        timing.initialDelay + position.actualStartDelay;
-      const adjustedTransformationDelay =
-        timing.totalTransformationDelay + position.actualStartDelay * 1000;
-      const animationString = `endless-cycle ${timing.animationDuration}s linear ${adjustedInitialDelay}s infinite`;
-
-      return {
-        key: cardId,
-        style: {
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-          animation: animationString,
-        },
-        transformationDelay: adjustedTransformationDelay,
-        cycleTime: timing.totalCycleTime,
-        index,
-        cardId,
-        laneId: position.laneId,
-        initialDelaySeconds: adjustedInitialDelay,
-      };
-    },
-    [generateTimingParameters]
-  );
-
-  // Mouse Move Effect
   useEffect(() => {
     const handleMouseMove = (e) => {
       const { clientX, clientY, currentTarget } = e;
@@ -359,20 +344,12 @@ const Hero = () => {
       setGlowPosition({ x: clientX - left, y: clientY - top });
     };
     const heroElement = document.getElementById("home");
-    if (heroElement) {
-      heroElement.addEventListener("mousemove", handleMouseMove);
-    }
-    return () => {
-      if (heroElement) {
-        heroElement.removeEventListener("mousemove", handleMouseMove);
-      }
-    };
+    heroElement.addEventListener("mousemove", handleMouseMove);
+    return () => heroElement.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Particle Setup
   useEffect(() => {
-    const numParticles = 120;
-    const newParticles = Array.from({ length: numParticles }).map(() => ({
+    const newParticles = Array.from({ length: 120 }).map(() => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
       animationDuration: `${2 + Math.random() * 4}s`,
@@ -382,82 +359,48 @@ const Hero = () => {
     setParticles(newParticles);
   }, []);
 
-  // Initialize and Endless Cycle for Flowing Cards
+  // KORRIGIERTER Hook für den Endlos-Zyklus
   useEffect(() => {
     if (!spatialGrid || !mountedRef.current) return;
 
     clearAllTimeouts();
 
-    const initialCards = transformationExamples
-      .map((_, index) => createNewCard(index, spatialGrid))
+    const initialCardsWithDelays = transformationExamples
+      .map((_, index) => {
+        const initialDelay = Math.random() * 5000; // Zufällige Verzögerung bis 5 Sekunden für den Start
+        return createNewCard(index, spatialGrid, initialDelay); // initialDelay übergeben
+      })
       .filter(Boolean);
 
     if (mountedRef.current) {
-      setFlowingCards(initialCards);
+      setFlowingCards(initialCardsWithDelays);
     }
 
-    initialCards.forEach((card) => {
-      const timeUntilFirstCycleEnds =
-        card.cycleTime + card.initialDelaySeconds * 1000;
+    const scheduleNextReplacement = (card) => {
+      // Die Zeit, wann der NÄCHSTE Zyklus dieser Karte beginnt.
+      // Wir müssen hier die ursprüngliche initialStartDelay berücksichtigen.
+      // Der Timeout wird erst am Ende des gesamten Lebenszyklus der KARTE ausgelöst.
+      const timeUntilNextCardCreation = card.cycleTime + card.initialStartDelay;
 
       const timeoutId = setTimeout(() => {
         if (!mountedRef.current) return;
 
-        const replaceCard = () => {
-          if (!mountedRef.current) return;
-          const newCard = createNewCard(card.index, spatialGrid);
-          if (newCard) {
-            setFlowingCards((prev) =>
-              prev.map((p) => (p.index === card.index ? newCard : p))
-            );
-          }
-        };
-
-        // Ersetze die Karte für den zweiten Zyklus sofort.
-        replaceCard();
-
-        // Starte das Intervall für alle folgenden Zyklen.
-        const intervalId = setInterval(replaceCard, card.cycleTime);
-        intervalsRef.current.add(intervalId);
-      }, timeUntilFirstCycleEnds);
-
-      timeoutsRef.current.add(timeoutId);
-    });
-
-    return () => {
-      clearAllTimeouts();
-    };
-  }, [spatialGrid, createNewCard, clearAllTimeouts]);
-
-  // Grid Cleanup on Unmount
-  useEffect(() => {
-    return () => {
-      if (spatialGrid) {
-        spatialGrid.clear();
-      }
-    };
-  }, [spatialGrid]);
-
-  // Debug Logging
-  useEffect(() => {
-    if (!spatialGrid) return;
-    const interval = setInterval(() => {
-      if (spatialGrid && mountedRef.current) {
-        const debugInfo = spatialGrid.getDebugInfo();
-        console.log("Spatial Grid Status:", debugInfo);
-
-        const busyLanes = debugInfo.laneUsage.filter(
-          (lane) => lane.activeCards > 2
-        );
-        if (busyLanes.length > debugInfo.totalLanes * 0.7) {
-          console.warn(
-            "High lane utilization detected - consider adjusting timing"
+        const newCard = createNewCard(card.index, spatialGrid);
+        if (newCard) {
+          setFlowingCards((prev) =>
+            prev.map((p) => (p.key === card.key ? newCard : p))
           );
+          scheduleNextReplacement(newCard); // Nächsten Zyklus für die neue Karte planen
         }
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [spatialGrid]);
+      }, timeUntilNextCardCreation);
+      timeoutsRef.current.add(timeoutId);
+    };
+
+    // Planen Sie den Ersatz für jede der initialen Karten
+    initialCardsWithDelays.forEach(scheduleNextReplacement);
+
+    return () => clearAllTimeouts();
+  }, [spatialGrid, createNewCard, clearAllTimeouts]);
 
   const handleScrollToContact = () =>
     document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
@@ -537,7 +480,6 @@ const Hero = () => {
           {flowingCards.map((card) => (
             <div
               key={card.key}
-              ref={flowingCardsRefs.current[card.index]}
               className="flowing-card absolute"
               style={card.style}
             >

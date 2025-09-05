@@ -148,25 +148,20 @@
     ==============================================
   */
 
-  /* Performance-Optimierungen für alle animierten Karten */
-  .flowing-card {
-    /* Weist dem Browser an, sich auf die Animation dieser Eigenschaften vorzubereiten */
-    will-change: transform, opacity;
-
-    /* Aktiviert die Hardware-Beschleunigung (GPU) für flüssigere Animationen */
-    transform: translateZ(0);
-
-    /* Verhindert Flackern bei 3D-Transformationen */
-    backface-visibility: hidden;
+  @keyframes endless-cycle {
+    0% {
+      opacity: 0;
+      transform: scale(0.5) translateY(0);
+    }
+    6% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(-75vh);
+    }
   }
-
-  /* Glättet die Schriftartendarstellung auf den Karten */
-  .flowing-card,
-  .flowing-card * {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
   /* --- Responsive Anpassungen --- */
   @media (max-width: 768px) {
     .flowing-card {
