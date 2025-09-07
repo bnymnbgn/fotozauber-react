@@ -9,7 +9,7 @@ export class EnhancedSpatialGrid {
     this.gridRows = Math.floor(height / (cardHeight + 250)); // 250px Abstand zwischen Reihen
     this.gridCols = Math.max(3, Math.floor(width / (cardWidth + 150))); // Mindestens 3 Spalten
     this.gridPositions = [];
-    
+
     // Erstelle vordefinierte Grid-Positionen
     for (let row = 0; row < this.gridRows; row++) {
       for (let col = 0; col < this.gridCols; col++) {
@@ -19,7 +19,7 @@ export class EnhancedSpatialGrid {
           row,
           col,
           occupied: false,
-          occupiedUntil: 0
+          occupiedUntil: 0,
         });
       }
     }
@@ -32,24 +32,26 @@ export class EnhancedSpatialGrid {
 
   findBestPosition(currentTime = Date.now()) {
     // Finde alle verfügbaren Positionen
-    const availablePositions = this.gridPositions.filter(pos => 
-      !pos.occupied || pos.occupiedUntil <= currentTime
+    const availablePositions = this.gridPositions.filter(
+      (pos) => !pos.occupied || pos.occupiedUntil <= currentTime
     );
 
     if (availablePositions.length === 0) {
       // Wenn keine Position verfügbar ist, finde die mit der kürzesten Wartezeit
       const soonestAvailable = this.gridPositions
-        .map(pos => ({
+        .map((pos) => ({
           ...pos,
-          waitTime: Math.max(0, pos.occupiedUntil - currentTime)
+          waitTime: Math.max(0, pos.occupiedUntil - currentTime),
         }))
         .sort((a, b) => a.waitTime - b.waitTime);
-      
+
       return soonestAvailable[0];
     }
 
     // Wähle zufällig aus verfügbaren Positionen
-    return availablePositions[Math.floor(Math.random() * availablePositions.length)];
+    return availablePositions[
+      Math.floor(Math.random() * availablePositions.length)
+    ];
   }
 
   // Wird nicht mehr benötigt mit Grid-System
@@ -72,7 +74,7 @@ export class EnhancedSpatialGrid {
     this.occupiedPositions.set(cardId, {
       position: bestPosition,
       startTime: actualStartTime,
-      duration: duration
+      duration: duration,
     });
 
     // Plane das Freigeben der Position
@@ -94,27 +96,34 @@ export class EnhancedSpatialGrid {
     };
   }
 
-  reservePositionWithCollisionCheck(cardId, duration, timing, occupiedPositions) {
+  reservePositionWithCollisionCheck(
+    cardId,
+    duration,
+    timing,
+    occupiedPositions
+  ) {
     const currentTime = Date.now();
-    
+
     // Finde alle verfügbaren Positionen
-    const availablePositions = this.gridPositions.filter(pos => {
+    const availablePositions = this.gridPositions.filter((pos) => {
       // Prüfe ob die Position im Grid frei ist
       const gridFree = !pos.occupied || pos.occupiedUntil <= currentTime;
-      
+
       // Prüfe ob die Position in der occupiedPositions Map frei ist
-      const mapFree = !Array.from(occupiedPositions.entries()).some(([otherCardId, occupation]) => {
-        if (otherCardId === cardId) return false; // Gleiche Karte ignorieren
-        
-        const distance = Math.sqrt(
-          Math.pow(pos.x - occupation.x, 2) + 
-          Math.pow(pos.y - occupation.y, 2)
-        );
-        
-        // Mindestabstand von 200px zwischen beliebigen Karten
-        return distance < 200 && occupation.until > currentTime;
-      });
-      
+      const mapFree = !Array.from(occupiedPositions.entries()).some(
+        ([otherCardId, occupation]) => {
+          if (otherCardId === cardId) return false; // Gleiche Karte ignorieren
+
+          const distance = Math.sqrt(
+            Math.pow(pos.x - occupation.x, 2) +
+              Math.pow(pos.y - occupation.y, 2)
+          );
+
+          // Mindestabstand von 200px zwischen beliebigen Karten
+          return distance < 200 && occupation.until > currentTime;
+        }
+      );
+
       return gridFree && mapFree;
     });
 
@@ -123,7 +132,8 @@ export class EnhancedSpatialGrid {
     }
 
     // Wähle die zufälligste verfügbare Position
-    const bestPosition = availablePositions[Math.floor(Math.random() * availablePositions.length)];
+    const bestPosition =
+      availablePositions[Math.floor(Math.random() * availablePositions.length)];
 
     const startTime = Math.max(currentTime, bestPosition.occupiedUntil);
     const actualStartTime = startTime + (timing.initialDelay || 0) * 1000;
@@ -136,7 +146,7 @@ export class EnhancedSpatialGrid {
     this.occupiedPositions.set(cardId, {
       position: bestPosition,
       startTime: actualStartTime,
-      duration: duration
+      duration: duration,
     });
 
     // Plane das Freigeben der Position
@@ -163,7 +173,7 @@ export class EnhancedSpatialGrid {
       clearTimeout(this.activeTimeouts.get(cardId));
       this.activeTimeouts.delete(cardId);
     }
-    
+
     if (this.occupiedPositions.has(cardId)) {
       const { position } = this.occupiedPositions.get(cardId);
       position.occupied = false;
@@ -176,7 +186,7 @@ export class EnhancedSpatialGrid {
     this.activeTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
     this.activeTimeouts.clear();
     this.occupiedPositions.clear();
-    this.gridPositions.forEach(pos => {
+    this.gridPositions.forEach((pos) => {
       pos.occupied = false;
       pos.occupiedUntil = 0;
     });
@@ -188,11 +198,12 @@ export class EnhancedSpatialGrid {
     const positionUsage = this.gridPositions.map((pos, index) => ({
       index,
       occupied: pos.occupied,
-      occupiedUntil: pos.occupiedUntil > Date.now() 
-        ? `${Math.ceil((pos.occupiedUntil - Date.now()) / 1000)}s` 
-        : "available",
+      occupiedUntil:
+        pos.occupiedUntil > Date.now()
+          ? `${Math.ceil((pos.occupiedUntil - Date.now()) / 1000)}s`
+          : "available",
       x: pos.x,
-      y: pos.y
+      y: pos.y,
     }));
     return {
       totalActiveCards,

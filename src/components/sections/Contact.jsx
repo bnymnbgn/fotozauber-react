@@ -1,57 +1,57 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Upload, 
-  X, 
-  Check, 
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Upload,
+  X,
+  Check,
   Send,
   MessageCircle,
   Clock,
-  Star
-} from 'lucide-react';
-import axios from 'axios';
+  Star,
+} from "lucide-react";
+import axios from "axios";
 
 const Contact = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
-  
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm();
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
-    const validFiles = files.filter(file => {
-      const validTypes = ['image/jpeg', 'image/png', 'image/tiff', 'image/raw'];
+    const validFiles = files.filter((file) => {
+      const validTypes = ["image/jpeg", "image/png", "image/tiff", "image/raw"];
       const maxSize = 10 * 1024 * 1024; // 10MB
       return validTypes.includes(file.type) && file.size <= maxSize;
     });
 
-    const newFiles = validFiles.map(file => ({
+    const newFiles = validFiles.map((file) => ({
       id: Date.now() + Math.random(),
       file,
       name: file.name,
       size: (file.size / 1024 / 1024).toFixed(1),
-      preview: URL.createObjectURL(file)
+      preview: URL.createObjectURL(file),
     }));
 
-    setUploadedFiles(prev => [...prev, ...newFiles]);
+    setUploadedFiles((prev) => [...prev, ...newFiles]);
   };
 
   const removeFile = (fileId) => {
-    setUploadedFiles(prev => {
-      const fileToRemove = prev.find(f => f.id === fileId);
+    setUploadedFiles((prev) => {
+      const fileToRemove = prev.find((f) => f.id === fileId);
       if (fileToRemove?.preview) {
         URL.revokeObjectURL(fileToRemove.preview);
       }
-      return prev.filter(f => f.id !== fileId);
+      return prev.filter((f) => f.id !== fileId);
     });
   };
 
@@ -61,9 +61,9 @@ const Contact = () => {
 
     try {
       const formData = new FormData();
-      
+
       // Füge Formular-Daten hinzu
-      Object.keys(data).forEach(key => {
+      Object.keys(data).forEach((key) => {
         formData.append(key, data[key]);
       });
 
@@ -73,29 +73,32 @@ const Contact = () => {
       });
 
       // Sende an PHP Backend
-      const response = await axios.post('/contact-process.php', formData, {
+      const response = await axios.post("/contact-process.php", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
       if (response.data.success) {
-        setSubmitStatus('success');
+        setSubmitStatus("success");
         reset();
         setUploadedFiles([]);
       } else {
-        throw new Error(response.data.message || 'Fehler beim Senden');
+        throw new Error(response.data.message || "Fehler beim Senden");
       }
     } catch (error) {
-      console.error('Contact form error:', error);
-      setSubmitStatus('error');
+      console.error("Contact form error:", error);
+      setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <section id="contact" className="section-padding bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+    <section
+      id="contact"
+      className="section-padding bg-gradient-to-br from-gray-50 to-white relative overflow-hidden"
+    >
       {/* Hintergrund-Dekoration */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 right-20 w-40 h-40 bg-purple-400 rounded-full blur-3xl"></div>
@@ -109,17 +112,18 @@ const Contact = () => {
             <MessageCircle className="w-4 h-4" />
             <span>KONTAKT AUFNEHMEN</span>
           </div>
-          
+
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             Lassen Sie uns
             <span className="block bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
               Magie erschaffen
             </span>
           </h2>
-          
+
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Bereit für die Verwandlung? Senden Sie uns Ihre Bilder und Ihre Wünsche. 
-            Wir machen aus gewöhnlichen Momenten unvergessliche Erinnerungen.
+            Bereit für die Verwandlung? Senden Sie uns Ihre Bilder und Ihre
+            Wünsche. Wir machen aus gewöhnlichen Momenten unvergessliche
+            Erinnerungen.
           </p>
         </div>
 
@@ -127,10 +131,13 @@ const Contact = () => {
           {/* Kontakt-Info */}
           <div className="space-y-8">
             <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Wie können wir helfen?</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                Wie können wir helfen?
+              </h3>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                Ob Einzelaufträge oder größere Projekte - wir freuen uns auf Ihre Anfrage. 
-                Teilen Sie uns Ihre Wünsche mit und laden Sie gerne bereits Ihre Bilder hoch.
+                Ob Einzelaufträge oder größere Projekte - wir freuen uns auf
+                Ihre Anfrage. Teilen Sie uns Ihre Wünsche mit und laden Sie
+                gerne bereits Ihre Bilder hoch.
               </p>
             </div>
 
@@ -192,11 +199,13 @@ const Contact = () => {
 
           {/* Kontakt-Formular */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
-            {submitStatus === 'success' && (
+            {submitStatus === "success" && (
               <div className="mb-6 p-4 bg-green-100 border border-green-200 rounded-xl">
                 <div className="flex items-center space-x-2 text-green-700">
                   <Check className="w-5 h-5" />
-                  <span className="font-medium">Nachricht erfolgreich gesendet!</span>
+                  <span className="font-medium">
+                    Nachricht erfolgreich gesendet!
+                  </span>
                 </div>
                 <p className="text-green-600 text-sm mt-1">
                   Wir werden uns schnellstmöglich bei Ihnen melden.
@@ -204,14 +213,15 @@ const Contact = () => {
               </div>
             )}
 
-            {submitStatus === 'error' && (
+            {submitStatus === "error" && (
               <div className="mb-6 p-4 bg-red-100 border border-red-200 rounded-xl">
                 <div className="flex items-center space-x-2 text-red-700">
                   <X className="w-5 h-5" />
                   <span className="font-medium">Fehler beim Senden</span>
                 </div>
                 <p className="text-red-600 text-sm mt-1">
-                  Bitte versuchen Sie es erneut oder kontaktieren Sie uns direkt.
+                  Bitte versuchen Sie es erneut oder kontaktieren Sie uns
+                  direkt.
                 </p>
               </div>
             )}
@@ -224,13 +234,15 @@ const Contact = () => {
                     Name *
                   </label>
                   <input
-                    {...register('name', { required: 'Name ist erforderlich' })}
+                    {...register("name", { required: "Name ist erforderlich" })}
                     type="text"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                     placeholder="Ihr Name"
                   />
                   {errors.name && (
-                    <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.name.message}
+                    </p>
                   )}
                 </div>
 
@@ -239,19 +251,21 @@ const Contact = () => {
                     E-Mail *
                   </label>
                   <input
-                    {...register('email', {
-                      required: 'E-Mail ist erforderlich',
+                    {...register("email", {
+                      required: "E-Mail ist erforderlich",
                       pattern: {
                         value: /^\S+@\S+$/i,
-                        message: 'Ungültige E-Mail-Adresse'
-                      }
+                        message: "Ungültige E-Mail-Adresse",
+                      },
                     })}
                     type="email"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                     placeholder="ihre@email.de"
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.email.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -263,7 +277,7 @@ const Contact = () => {
                     Telefon
                   </label>
                   <input
-                    {...register('phone')}
+                    {...register("phone")}
                     type="tel"
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                     placeholder="+49 (0) 123 456789"
@@ -275,7 +289,9 @@ const Contact = () => {
                     Betreff *
                   </label>
                   <select
-                    {...register('subject', { required: 'Betreff ist erforderlich' })}
+                    {...register("subject", {
+                      required: "Betreff ist erforderlich",
+                    })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                   >
                     <option value="">Bitte wählen</option>
@@ -285,7 +301,9 @@ const Contact = () => {
                     <option value="sonstiges">Sonstiges</option>
                   </select>
                   {errors.subject && (
-                    <p className="text-red-500 text-sm mt-1">{errors.subject.message}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.subject.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -296,14 +314,36 @@ const Contact = () => {
                   Nachricht *
                 </label>
                 <textarea
-                  {...register('message', { required: 'Nachricht ist erforderlich' })}
+                  {...register("message", {
+                    required: "Nachricht ist erforderlich",
+                  })}
                   rows={5}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 resize-none"
-                  placeholder="Beschreiben Sie Ihre Wünsche und Vorstellungen..."
+                  placeholder="Erzählen Sie mir von den Träumen Ihres Kindes! Welche Abenteuer, Farben oder Stimmungen stellen Sie sich für Ihr einzigartiges Kunstwerk vor?"
                 />
                 {errors.message && (
-                  <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.message.message}
+                  </p>
                 )}
+              </div>
+
+              {/* Checkbox für Portfolio-Einwilligung */}
+              <div className="flex items-center space-x-3">
+                <input
+                  {...register("portfolioConsent")}
+                  type="checkbox"
+                  id="portfolioConsent"
+                  className="custom-checkbox" // Neue benutzerdefinierte Klasse
+                />
+                <label
+                  htmlFor="portfolioConsent"
+                  className="text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  Ich bin damit einverstanden, dass das fertige Kunstwerk
+                  (anonymisiert) im Portfolio von NOHA STUDIO gezeigt werden
+                  darf.
+                </label>
               </div>
 
               {/* File Upload */}
@@ -338,16 +378,23 @@ const Contact = () => {
                       Hochgeladene Dateien ({uploadedFiles.length})
                     </h5>
                     <div className="space-y-2 max-h-32 overflow-y-auto">
-                      {uploadedFiles.map(file => (
-                        <div key={file.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
-                          <img 
-                            src={file.preview} 
+                      {uploadedFiles.map((file) => (
+                        <div
+                          key={file.id}
+                          className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg"
+                        >
+                          <img
+                            src={file.preview}
                             alt={file.name}
                             className="w-10 h-10 object-cover rounded"
                           />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-gray-900 truncate">{file.name}</p>
-                            <p className="text-xs text-gray-500">{file.size} MB</p>
+                            <p className="text-sm text-gray-900 truncate">
+                              {file.name}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {file.size} MB
+                            </p>
                           </div>
                           <button
                             type="button"
@@ -388,13 +435,19 @@ const Contact = () => {
               <div className="flex items-center space-x-2 mb-3">
                 <div className="flex space-x-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                    <Star
+                      key={i}
+                      className="w-4 h-4 text-yellow-400 fill-current"
+                    />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">5.0 aus 150+ Bewertungen</span>
+                <span className="text-sm text-gray-600">
+                  5.0 aus 150+ Bewertungen
+                </span>
               </div>
               <p className="text-sm text-gray-500 italic">
-                "Fantastischer Service! Die Bilder sind absolut magisch geworden." - Sarah M.
+                "Fantastischer Service! Die Bilder sind absolut magisch
+                geworden." - Sarah M.
               </p>
             </div>
           </div>

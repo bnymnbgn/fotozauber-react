@@ -2,7 +2,7 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagicCircleCard from "../ui/MagicCircleCard";
-import ComparisonSlider from "../ui/ComparisonSlider";
+import HoverComparisonSlider from "../ui/HoverComparisonSlider";
 import Button from "../ui/Button";
 import Lightbox from "../ui/Lightbox";
 import { transformationExamples } from "../../data/transformationExamples";
@@ -250,9 +250,12 @@ const Hero = () => {
       {/* Lightbox Sektion */}
       <Lightbox isOpen={lightboxOpen} onClose={closeLightbox}>
         <div className="w-full max-w-5xl mx-auto p-4">
-          <ComparisonSlider
+          {/* --- ANPASSUNG HIER --- */}
+          <HoverComparisonSlider
             beforeImage={transformationExamples[currentLightboxIndex].before}
             afterImage={transformationExamples[currentLightboxIndex].after}
+            title={transformationExamples[currentLightboxIndex].alt}
+            enforceAspectRatio={false} // HIER: Originalgröße im Modal erzwingen
           />
           <p className="mt-4 text-center text-white text-lg">
             {transformationExamples[currentLightboxIndex].alt}

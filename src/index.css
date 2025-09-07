@@ -57,7 +57,25 @@
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
   }
-  /* --- HIER EINFÜGEN ENDE --- */
+
+  /* Neue Checkbox-Styles */
+  .custom-checkbox {
+    @apply w-5 h-5 rounded appearance-none border border-gray-300 bg-white checked:bg-gradient-to-r checked:from-primary-600 checked:to-secondary-600 checked:border-transparent focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer;
+    transform: translateZ(0); /* GPU-Beschleunigung */
+  }
+
+  /* Pseudo-Element für Häkchen-Symbol */
+  .custom-checkbox:checked::after {
+    content: "\2713"; /* Unicode für Häkchen */
+    @apply text-white text-center text-sm leading-5 block;
+  }
+
+  /* Barrierefreiheit: Reduzierte Animationen */
+  @media (prefers-reduced-motion: reduce) {
+    .custom-checkbox {
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer utilities {
