@@ -74,16 +74,20 @@ export const services = [
 export const galleryImages = [
   {
     id: 1,
-    src: "/assets/img/pic1.jpg",
+    src: "/assets/img/randombebe after.jpg",
     alt: "Weltraum Abenteuer",
     category: "space",
     title: "Kleine Astronautin",
     description: "Eine magische Reise zu fernen Galaxien und Planeten",
     transformation: "Weltraum Compositing",
+    customerWish:
+      "Emilias größter Traum war es, einmal durch die Sterne zu fliegen. Ihre Eltern wünschten sich ein verträumtes, aber kraftvolles Bild, das ihre Fantasie widerspiegelt.",
+    ourProcess:
+      "Wir haben gemeinsam verschiedene Posen ausprobiert und uns für diesen dynamischen Flug entschieden. Die Farben des Nebels wurden exakt auf die Töne ihres Lieblingskleides abgestimmt, um eine persönliche Note zu schaffen.",
   },
   {
     id: 2,
-    src: "/assets/img/before.jpg",
+    src: "/assets/img/TIGER after.jpg",
     alt: "Dschungel Expedition - Vorher",
     category: "animals",
     title: "Dschungel Abenteuer",
@@ -92,7 +96,7 @@ export const galleryImages = [
   },
   {
     id: 3,
-    src: "/assets/img/after.jpg",
+    src: "/assets/img/ele after.jpg",
     alt: "Dschungel Expedition - Nachher",
     category: "animals",
     title: "Wilde Freundschaften",
@@ -101,7 +105,7 @@ export const galleryImages = [
   },
   {
     id: 4,
-    src: "/assets/transforms/1.png",
+    src: "/assets/img/bebe after.jpg",
     alt: "Unterwasser Märchen",
     category: "underwater",
     title: "Kleine Meerjungfrau",
@@ -110,16 +114,20 @@ export const galleryImages = [
   },
   {
     id: 5,
-    src: "/assets/transforms/2.png",
+    src: "/assets/img/Halid 1.jpg",
     alt: "Fantasy Prinzessin",
     category: "fantasy",
     title: "Märchen Prinzessin",
     description: "In einem Schloss voller Magie und Wunder",
     transformation: "Märchen Styling",
+    customerWish:
+      "Die Kundin wünschte sich ein Porträt im Stil eines klassischen Märchens, das sie als Prinzessin in einem verzauberten Schloss zeigt.",
+    ourProcess:
+      "Der Fokus lag auf der Integration des Kindes in eine gemalte Schlosskulisse. Mittels Licht- und Schattenanpassungen wurde eine realistische Beleuchtung simuliert, die zum verträumten Stil passt.",
   },
   {
     id: 6,
-    src: "/assets/transforms/3.png",
+    src: "/assets/img/after.jpg",
     alt: "Weltraum Entdecker",
     category: "space",
     title: "Galaktischer Entdecker",
@@ -128,7 +136,7 @@ export const galleryImages = [
   },
   {
     id: 7,
-    src: "/assets/transforms/4.png",
+    src: "/assets/img/after1.jpg",
     alt: "Magischer Garten",
     category: "fantasy",
     title: "Verzauberter Garten",
@@ -137,7 +145,7 @@ export const galleryImages = [
   },
   {
     id: 8,
-    src: "/assets/transforms/5.png",
+    src: "/assets/img/after5.jpg",
     alt: "Überraschungs Transformation",
     category: "surprise",
     title: "Magische Überraschung",
@@ -185,17 +193,46 @@ export const galleryImages = [
 export const comparisons = [
   {
     id: 1,
-    before: "/assets/img/Halid 1.1.jpg",
-    after: "/assets/img/Halid 1.jpg",
-    title: "Magische Transformation",
-    description: "Von normalem Foto zu fantastischem Kunstwerk",
+    before: "/assets/img/Halid before.jpg",
+    after: "/assets/img/Halid after.jpg",
+    title: "Landschaftsfotografie",
+    description:
+      "Transformation einer Standardaufnahme in ein episches Landschaftsbild.", // Optional Beschreibung hinzufügen
   },
   {
     id: 2,
-    before: "/assets/img/randombebe.jpg",
-    after: "/assets/img/randombebe Kopie.jpg",
-    title: "Weltraum-Abenteuer",
-    description: "Entdecke ferne Galaxien und Planeten",
+    before: "/assets/img/bebe before.jpg",
+    after: "/assets/img/bebe after.jpg",
+    title: "Porträtfotografie",
+    description: "Kreative Bearbeitung eines Kinderporträts.", // Optional Beschreibung hinzufügen
+  },
+  {
+    id: 3,
+    before: "/assets/img/randombebe before.jpg",
+    after: "/assets/img/randombebe after.jpg",
+    title: "Architekturfotografie",
+    description: "Details und Stimmung in der Architektur hervorheben.", // Optional Beschreibung hinzufügen
+  },
+  {
+    id: 4,
+    before: "/assets/img/TIGER before.jpg",
+    after: "/assets/img/TIGER after.jpg",
+    title: "Naturfotografie",
+    description: "Farbkorrektur und Schärfung bei Tieraufnahmen.", // Optional Beschreibung hinzufügen
+  },
+  {
+    id: 5,
+    before: "/assets/img/before1.jpg",
+    after: "/assets/img/after1.jpg",
+    title: "Straßenfotografie",
+    description: "Dynamik und Lichtstimmung verbessern.", // Optional Beschreibung hinzufügen
+  },
+  {
+    id: 6,
+    before: "/assets/img/before.jpg",
+    after: "/assets/img/after.jpg",
+    title: "Farbkorrektur",
+    description: "Von blassen Farben zu lebendigen Ergebnissen.", // Optional Beschreibung hinzufügen
   },
 ];
 

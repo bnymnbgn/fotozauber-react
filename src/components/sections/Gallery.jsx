@@ -12,19 +12,11 @@ import { cn } from "../../utils/cn";
 // ====================================================================================
 function ExpandedCard({ image, close }) {
   const handleScroll = (e) => e.stopPropagation();
-
-  // NEU: Definierte Transition für ein flüssigeres Gefühl
   const transition = { type: "spring", stiffness: 250, damping: 30 };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden" onClick={close}>
-      <motion.div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0, transition: { duration: 0.15 } }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
-      />
+      {/* ... Backdrop ... */}
       <div className="absolute inset-0 overflow-y-auto" onScroll={handleScroll}>
         <div
           className="container mx-auto max-w-4xl my-12"
@@ -33,8 +25,9 @@ function ExpandedCard({ image, close }) {
           <motion.div
             layoutId={`card-container-${image.id}`}
             className="bg-white rounded-2xl overflow-hidden shadow-2xl"
-            transition={transition} // NEU: Flüssige Spring-Animation
+            transition={transition}
           >
+            {/* ... Bild und Schließen-Button ... */}
             <div className="relative">
               <motion.img
                 layoutId={`card-image-${image.id}`}
@@ -42,7 +35,7 @@ function ExpandedCard({ image, close }) {
                 alt={image.alt}
                 className="w-full h-auto max-h-[70vh] object-cover cursor-pointer"
                 onClick={close}
-                transition={transition} // NEU: Flüssige Spring-Animation
+                transition={transition}
               />
               <motion.button
                 onClick={close}
@@ -54,6 +47,8 @@ function ExpandedCard({ image, close }) {
                 <X className="w-6 h-6 text-gray-800" />
               </motion.button>
             </div>
+
+            {/* --- Inhaltsbereich --- */}
             <motion.div
               className="p-8"
               initial={{ opacity: 0 }}
@@ -78,13 +73,39 @@ function ExpandedCard({ image, close }) {
                 {image.transformation}
               </motion.p>
               <div className="w-16 h-1 bg-purple-200 my-6"></div>
-              <p className="text-gray-700 leading-relaxed">
-                {image.description} Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-                exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                consequat.
+
+              {/* Basisbeschreibung */}
+              <p className="text-gray-700 leading-relaxed mb-6">
+                {image.description}
               </p>
+
+              {/* --- START: Neue Sektion für Kundendetails --- */}
+              <div className="space-y-6">
+                {/* Bedingte Anzeige für Kundenwunsch */}
+                {image.customerWish && (
+                  <div>
+                    <h4 className="text-xl font-semibold text-gray-800 mb-2">
+                      Der Kundenwunsch
+                    </h4>
+                    <p className="text-gray-700 leading-relaxed">
+                      {image.customerWish}
+                    </p>
+                  </div>
+                )}
+
+                {/* Bedingte Anzeige für Prozess */}
+                {image.ourProcess && (
+                  <div>
+                    <h4 className="text-xl font-semibold text-gray-800 mb-2">
+                      Unser kreativer Prozess
+                    </h4>
+                    <p className="text-gray-700 leading-relaxed">
+                      {image.ourProcess}
+                    </p>
+                  </div>
+                )}
+              </div>
+              {/* --- ENDE: Neue Sektion für Kundendetails --- */}
             </motion.div>
           </motion.div>
         </div>

@@ -8,34 +8,49 @@ class EnhancedSpatialGrid {
     this.height = height;
     this.cardWidth = cardWidth;
     this.cardHeight = cardHeight;
-
-    this.laneWidth = cardWidth + 50; // Breite einer Spur (Karte + Puffer)
-    this.numLanes = Math.floor(width / this.laneWidth);
-
-    // Initialisiere Spuren (Lanes)
-    this.lanes = Array.from({ length: this.numLanes }, (_, i) => ({
-      id: i,
-      x: i * this.laneWidth + (this.laneWidth - cardWidth) / 2,
-      activeCards: new Map(), // Speichert Karten, die derzeit in dieser Spur aktiv sind
-      nextAvailableTime: 0, // Zeitstempel, wann diese Spur wieder belegt werden darf
-    }));
-
-    // *** AGGRESSIVE PARAMETERANPASSUNG ***
-    // Mindestabstand zwischen den Startpunkten (Y) der Karten.
-    // Wenn die Karten vertikal driften, muss dieser Wert die Drift + Kartenhöhe abdecken.
-    // Erhöhe diesen Wert, wenn Kollisionen weiterhin auftreten.
-    this.minVerticalGap = cardHeight + 300; // Erhöhter Puffer (vorher: +200)
-
-    // Mindestzeit in Millisekunden, bevor dieselbe Spur wieder verwendet werden darf.
-    // Ein höherer Wert reduziert die Dichte pro Spur drastisch.
-    this.minTimingGap = 6000; // Erhöhter Zeitpuffer (vorher: 3000-4000)
-
     this.activeTimeouts = new Map();
+    const mobileBreakpoint = 768;
+    this.isMobile = width < mobileBreakpoint;
+
+    if (this.isMobile) {
+      // --- MOBILE KONFIGURATION ---
+      this.numLanes = 2;
+      const mobileEdgeOffset = -cardWidth / 4;
+      this.lanes = [
+        {
+          id: 0,
+          x: mobileEdgeOffset,
+          activeCards: new Map(),
+          nextAvailableTime: 0,
+        },
+        {
+          id: 1,
+          x: width - cardWidth - mobileEdgeOffset,
+          activeCards: new Map(),
+          nextAvailableTime: 0,
+        },
+      ];
+      // Aggressiver Abstand, falls doch mal etwas kollidieren sollte
+      this.minVerticalGap = cardHeight + 500;
+    } else {
+      // --- DESKTOP KONFIGURATION ---
+      this.laneWidth = cardWidth + 50;
+      this.numLanes = Math.floor(width / this.laneWidth);
+      this.lanes = Array.from({ length: this.numLanes }, (_, i) => ({
+        id: i,
+        x: i * this.laneWidth + (this.laneWidth - cardWidth) / 2,
+        activeCards: new Map(),
+        nextAvailableTime: 0,
+      }));
+      this.minVerticalGap = cardHeight + 300;
+    }
+    // ErhÃ¶hen Sie minTimingGap, um sicherzustellen, dass eine Spur "ruht", bevor die nÃ¤chste Karte kommt.
+    this.minTimingGap = 8000; // 8 Sekunden Pause pro Spur
   }
 
   /**
-   * Findet die beste Spur (Lane) für eine neue Karte.
-   * Priorisiert Spuren mit den wenigsten aktiven Karten und der kürzesten Wartezeit.
+   * Findet die beste Spur (Lane) fÃ¼r eine neue Karte.
+   * Priorisiert Spuren mit den wenigsten aktiven Karten und der kÃ¼rzesten Wartezeit.
    */
   findBestLane(currentTime = Date.now()) {
     const laneStats = this.lanes.map((lane) => ({
@@ -59,7 +74,7 @@ class EnhancedSpatialGrid {
       (l) => l.waitTime === minWaitTime
     );
 
-    // Wähle zufällig aus den besten Kandidaten
+    // WÃ¤hle zufÃ¤llig aus den besten Kandidaten
     return bestLanes[Math.floor(Math.random() * bestLanes.length)];
   }
 
@@ -70,62 +85,69 @@ class EnhancedSpatialGrid {
    * @param {number} prospectiveStartTime - Der geplante Startzeitpunkt der neuen Karte.
    */
   calculateSafeYPosition(lane, prospectiveStartTime) {
-    // Filtere Karten, deren Lebensdauer sich mit dem Startzeitpunkt der neuen Karte überschneidet.
-    const activeCardsInLane = Array.from(lane.activeCards.values()).filter(
-      (card) => prospectiveStartTime < card.startTime + card.duration
-    );
-
     const availableHeight = this.height - this.cardHeight;
 
-    if (activeCardsInLane.length === 0) {
+    if (this.isMobile) {
+      // --- MOBILE STRATEGIE: FESTER STARTPUNKT ---
+      // Um Ãœberlappungen zu vermeiden und einen echten Zyklus zu simulieren,
+      // starten alle Karten auf MobilgerÃ¤ten an derselben Y-Position (unten).
+      // Die Trennung erfolgt hier rein zeitlich Ã¼ber minTimingGap.
+      return availableHeight; // Platziert die Oberkante der Karte am unteren Rand des verfÃ¼gbaren Bereichs.
+    } else {
+      // --- DESKTOP STRATEGIE: URSPRÃœNGLICHE LOGIK (Zufall + Kollisionscheck) ---
+
+      // Filtere Karten, deren Lebensdauer sich mit dem Startzeitpunkt der neuen Karte Ã¼berschneidet.
+      const activeCardsInLane = Array.from(lane.activeCards.values()).filter(
+        (card) => prospectiveStartTime < card.startTime + card.duration
+      );
+
+      if (activeCardsInLane.length === 0) {
+        return Math.random() * availableHeight;
+      }
+
+      const occupiedYs = activeCardsInLane.map((card) => card.y);
+      const maxAttempts = 30; // Anzahl der Versuche, eine zufÃ¤llige Position zu finden
+
+      // 1. Zufallsversuche (Optimierung)
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const candidateY = Math.random() * availableHeight;
+        const isSafe = occupiedYs.every(
+          (existingY) => Math.abs(candidateY - existingY) >= this.minVerticalGap
+        );
+        if (isSafe) {
+          return candidateY;
+        }
+      }
+
+      // 2. Iterativer Scan (Robuster Fallback)
+      const stepSize = this.cardHeight / 4; // SchrittgrÃ¶ÃŸe fÃ¼r das Scannen
+      for (
+        let candidateY = 0;
+        candidateY <= availableHeight;
+        candidateY += stepSize
+      ) {
+        const isSafe = occupiedYs.every(
+          (existingY) => Math.abs(candidateY - existingY) >= this.minVerticalGap
+        );
+        if (isSafe) {
+          return candidateY;
+        }
+      }
+
+      // 3. Notfall-Fallback fÃ¼r Desktop (kann bei hoher Dichte zu Ãœberlappungen fÃ¼hren)
+      console.warn(
+        `[EnhancedSpatialGrid] Could not find safe position in lane ${lane.id} (Desktop). Density issue.`
+      );
       return Math.random() * availableHeight;
     }
-
-    const occupiedYs = activeCardsInLane.map((card) => card.y);
-    const maxAttempts = 30; // Anzahl der Versuche, eine zufällige Position zu finden
-
-    // 1. Zufallsversuche (Optimierung)
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      const candidateY = Math.random() * availableHeight;
-      const isSafe = occupiedYs.every(
-        (existingY) => Math.abs(candidateY - existingY) >= this.minVerticalGap
-      );
-      if (isSafe) {
-        return candidateY;
-      }
-    }
-
-    // 2. Iterativer Scan (Robuster Fallback)
-    // Wenn Zufallsversuche fehlschlagen, scanne den Bildschirm schrittweise ab.
-    const stepSize = this.cardHeight / 4; // Schrittgröße für das Scannen
-    for (
-      let candidateY = 0;
-      candidateY <= availableHeight;
-      candidateY += stepSize
-    ) {
-      const isSafe = occupiedYs.every(
-        (existingY) => Math.abs(candidateY - existingY) >= this.minVerticalGap
-      );
-      if (isSafe) {
-        return candidateY;
-      }
-    }
-
-    // 3. Notfall-Fallback
-    // Wenn absolut kein Platz gefunden wurde (wg. extrem hoher Dichte oder zu großem minVerticalGap),
-    // gib eine zufällige Position zurück und protokolliere eine Warnung.
-    console.warn(
-      `[EnhancedSpatialGrid] Could not find safe position in lane ${lane.id}. Density issue.`
-    );
-    return Math.random() * availableHeight;
   }
 
   /**
-   * Reserviert eine Position im Grid für eine neue Karte.
+   * Reserviert eine Position im Grid fÃ¼r eine neue Karte.
    * @param {string} cardId - Eindeutige ID der Karte.
    * @param {number} duration - Dauer der Kartenanzeige in Millisekunden.
    * @param {object} timing - Timing-Informationen (z.B. initialDelay).
-   * @returns {object} Positionsdaten (x, y) und tatsächliche Startverzögerung.
+   * @returns {object} Positionsdaten (x, y) und tatsÃ¤chliche StartverzÃ¶gerung.
    */
   reservePosition(cardId, duration, timing) {
     const currentTime = Date.now();
@@ -147,7 +169,7 @@ class EnhancedSpatialGrid {
 
     const cleanupTime = cardInfo.startTime + duration + 1000; // 1 Sekunde Puffer
 
-    // Aufräum-Timeout für diese Karte setzen/aktualisieren
+    // AufrÃ¤um-Timeout fÃ¼r diese Karte setzen/aktualisieren
     if (this.activeTimeouts.has(cardId)) {
       clearTimeout(this.activeTimeouts.get(cardId));
     }
@@ -167,7 +189,7 @@ class EnhancedSpatialGrid {
   }
 
   /**
-   * Gibt die Position einer Karte explizit frei und entfernt den Aufräum-Timeout.
+   * Gibt die Position einer Karte explizit frei und entfernt den AufrÃ¤um-Timeout.
    * @param {string} cardId - ID der freizugebenden Karte.
    */
   freePosition(cardId) {
@@ -180,7 +202,7 @@ class EnhancedSpatialGrid {
     });
   }
 
-  /** Räumt alle Timeouts und aktiven Karten auf (z.B. bei unmount). */
+  /** RÃ¤umt alle Timeouts und aktiven Karten auf (z.B. bei unmount). */
   clear() {
     this.activeTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
     this.activeTimeouts.clear();
@@ -191,7 +213,7 @@ class EnhancedSpatialGrid {
   }
 }
 
-// --- React Hook für die Animation ---
+// --- React Hook fÃ¼r die Animation ---
 
 const useSpatialCardAnimation = (transformationExamples) => {
   const [flowingCards, setFlowingCards] = useState([]);
@@ -199,27 +221,36 @@ const useSpatialCardAnimation = (transformationExamples) => {
   const timeoutsRef = useRef(new Set());
   const mountedRef = useRef(true);
 
+  // NEU: Ref für die Verfolgung der bereits verwendeten Indices
+  const usedIndicesRef = useRef(new Set());
+
   // Hilfsfunktion zum Bereinigen aller laufenden Timeouts
   const clearAllTimeouts = useCallback(() => {
     timeoutsRef.current.forEach((id) => clearTimeout(id));
     timeoutsRef.current.clear();
   }, []);
 
+  // Ref, um den aktuellen Stand von flowingCards fÃ¼r asynchrone Callbacks zu halten
+  const flowingCardsRef = useRef(flowingCards);
+  useEffect(() => {
+    flowingCardsRef.current = flowingCards;
+  }, [flowingCards]);
+
   // Berechnet die Dauer der verschiedenen Animationsphasen (JETZT RANDOMISIERT)
   const generateTimingParameters = useCallback(() => {
     // --- STEUERPARAMETER 1: FLUSSGESCHWINDIGKEIT ---
-    // Legt fest, wie lange die Karte für die gesamte Bewegung über den Bildschirm benötigt.
-    // Höherer Wert = langsamere Bewegung.
+    // Legt fest, wie lange die Karte fÃ¼r die gesamte Bewegung Ã¼ber den Bildschirm benÃ¶tigt.
+    // HÃ¶herer Wert = langsamere Bewegung.
     const flowDurationSeconds = 25.0; // z.B. 25 Sekunden Gesamtdauer
 
     // --- STEUERPARAMETER 2: INTERNE TRANSFORMATIONSLOGIK ---
     // Legt fest, wann die Transformation (z.B. Bildwechsel) stattfindet,
-    // unabhängig von der Gesamtflussdauer.
+    // unabhÃ¤ngig von der Gesamtflussdauer.
 
-    // Option A: Fester Zeitpunkt für die Transformation (z.B. immer nach 4 Sekunden)
+    // Option A: Fester Zeitpunkt fÃ¼r die Transformation (z.B. immer nach 4 Sekunden)
     // const beforeImageFlowDurationSeconds = 4.0;
 
-    // Option B: Randomisierter Zeitpunkt für die Transformation (empfohlen für Varianz)
+    // Option B: Randomisierter Zeitpunkt fÃ¼r die Transformation (empfohlen fÃ¼r Varianz)
     const minPhase1Duration = 3.0; // Min. Dauer Phase 1 in Sekunden
     const maxPhase1Duration = 6.0; // Max. Dauer Phase 1 in Sekunden
     const beforeImageFlowDurationSeconds =
@@ -228,15 +259,15 @@ const useSpatialCardAnimation = (transformationExamples) => {
 
     // --- BERECHNUNGEN ---
 
-    // 1. Gesamtzykluszeit (für CSS-Animation und Respawn-Timer)
+    // 1. Gesamtzykluszeit (fÃ¼r CSS-Animation und Respawn-Timer)
     //    Wird direkt von der Flussgeschwindigkeit bestimmt.
     const totalCycleTimeMs = flowDurationSeconds * 1000;
 
-    // 2. Transformationsverzögerung (interner Zeitpunkt des Bildwechsels)
-    //    Wird unabhängig von der Gesamtzeit berechnet.
+    // 2. TransformationsverzÃ¶gerung (interner Zeitpunkt des Bildwechsels)
+    //    Wird unabhÃ¤ngig von der Gesamtzeit berechnet.
     const transformationDelayMs = beforeImageFlowDurationSeconds * 1000;
 
-    // Sicherheitsprüfung: Stellen Sie sicher, dass die Transformation nicht nach dem Ende des Zyklus stattfindet.
+    // SicherheitsprÃ¼fung: Stellen Sie sicher, dass die Transformation nicht nach dem Ende des Zyklus stattfindet.
     if (beforeImageFlowDurationSeconds >= flowDurationSeconds) {
       console.warn(
         "Transformation timing issue: Phase 1 duration exceeds total flow duration."
@@ -252,11 +283,44 @@ const useSpatialCardAnimation = (transformationExamples) => {
     };
   }, []);
 
+  // NEU: Hilfsfunktion für zufällige Index-Auswahl mit Rotation
+  const getNewRandomIndex = useCallback(() => {
+    const totalExampleCount = transformationExamples.length;
+
+    // Wenn alle Indices verwendet wurden, setze die Verfolgung zurück
+    if (usedIndicesRef.current.size >= totalExampleCount) {
+      usedIndicesRef.current.clear();
+    }
+
+    // Erstelle Array von noch nicht verwendeten Indices
+    const availableIndices = [];
+    for (let i = 0; i < totalExampleCount; i++) {
+      if (!usedIndicesRef.current.has(i)) {
+        availableIndices.push(i);
+      }
+    }
+
+    // Wenn keine verfügbaren Indices, nimm alle
+    if (availableIndices.length === 0) {
+      usedIndicesRef.current.clear();
+      for (let i = 0; i < totalExampleCount; i++) {
+        availableIndices.push(i);
+      }
+    }
+
+    // Wähle zufälligen Index aus verfügbaren
+    const randomIndex =
+      availableIndices[Math.floor(Math.random() * availableIndices.length)];
+    usedIndicesRef.current.add(randomIndex);
+
+    return randomIndex;
+  }, [transformationExamples.length]);
+
   /**
    * Erstellt eine neue Karte und reserviert eine Position im Grid.
    * @param {number} index - Index des Beispielsdatensatzes.
    * @param {object} grid - Referenz auf das EnhancedSpatialGrid.
-   * @param {number} initialStartDelayMs - Gewünschte Startverzögerung in Millisekunden.
+   * @param {number} initialStartDelayMs - GewÃ¼nschte StartverzÃ¶gerung in Millisekunden.
    */
   const createNewCard = useCallback(
     (index, grid, initialStartDelayMs = 0) => {
@@ -285,7 +349,7 @@ const useSpatialCardAnimation = (transformationExamples) => {
           top: `${positionData.y}px`,
           animation: animationString,
         },
-        transformationDelay: timing.transformationDelay, // Interner Delay der Karte für Bildwechsel
+        transformationDelay: timing.transformationDelay, // Interner Delay der Karte fÃ¼r Bildwechsel
         cycleTime: timing.totalCycleTime, // Gesamtdauer des Zyklus
         startTime: Date.now() + animationStartDelaySeconds * 1000, // Berechneter Startzeitpunkt
         index,
@@ -303,7 +367,7 @@ const useSpatialCardAnimation = (transformationExamples) => {
     (card) => {
       // Berechne die verbleibende Zeit bis zum Ende des aktuellen Zyklus der Karte.
       const timeRemaining = card.startTime + card.cycleTime - Date.now();
-      // Füge einen kleinen Puffer hinzu, um Race Conditions sicher zu vermeiden.
+      // FÃ¼ge einen kleinen Puffer hinzu, um Race Conditions sicher zu vermeiden.
       const delayUntilRespawn = Math.max(0, timeRemaining) + 50;
 
       const timeoutId = setTimeout(() => {
@@ -312,9 +376,9 @@ const useSpatialCardAnimation = (transformationExamples) => {
         // *** SYNCHRONISATION: Alte Karte explizit aus dem Grid entfernen ***
         spatialGridRef.current.freePosition(card.cardId);
 
-        // Neue Karte erstellen (ohne initialStartDelay, da sie sofort beginnen soll,
-        // die Verzögerung wird durch nextAvailableTime im Grid gesteuert).
-        const newCard = createNewCard(card.index, spatialGridRef.current, 0);
+        // NEU: Verwende neuen zufälligen Index statt dem alten Index
+        const newIndex = getNewRandomIndex();
+        const newCard = createNewCard(newIndex, spatialGridRef.current, 0);
 
         if (newCard) {
           setFlowingCards((prev) =>
@@ -326,8 +390,8 @@ const useSpatialCardAnimation = (transformationExamples) => {
 
       timeoutsRef.current.add(timeoutId);
     },
-    [createNewCard]
-  ); // createNewCard ist dependency
+    [createNewCard, getNewRandomIndex]
+  );
 
   // Initialisierung und Resize-Handler
   useEffect(() => {
@@ -337,17 +401,31 @@ const useSpatialCardAnimation = (transformationExamples) => {
       if (!mountedRef.current) return;
       clearAllTimeouts();
 
+      // NEU: Reset der verwendeten Indices bei Initialisierung
+      usedIndicesRef.current.clear();
+
       spatialGridRef.current = new EnhancedSpatialGrid(
         window.innerWidth,
         window.innerHeight
       );
 
-      const initialCards = transformationExamples
-        .map((_, index) => {
-          const initialDelay = Math.random() * 5000; // Zufällige Startverzögerung für initialen Load
-          return createNewCard(index, spatialGridRef.current, initialDelay);
-        })
-        .filter(Boolean); // Entferne null-Werte, falls Erstellung fehlschlägt
+      const grid = spatialGridRef.current;
+      const mobileCardCount = 2; // Setzen Sie hier die gewÃ¼nschte maximale Anzahl fÃ¼r Mobile (z.B. 4 oder 6)
+
+      const numCardsToShow = grid.isMobile
+        ? Math.min(mobileCardCount, transformationExamples.length) // Nimm maximal 2 Karten, aber nicht mehr als vorhanden
+        : transformationExamples.length;
+
+      // NEU: Erstelle Karten mit zufälligen Indices statt sequenzieller
+      const initialCards = [];
+      for (let i = 0; i < numCardsToShow; i++) {
+        const randomIndex = getNewRandomIndex();
+        const initialDelay = Math.random() * 5000;
+        const card = createNewCard(randomIndex, grid, initialDelay);
+        if (card) {
+          initialCards.push(card);
+        }
+      }
 
       setFlowingCards(initialCards);
       initialCards.forEach(scheduleNextReplacement);
@@ -355,11 +433,7 @@ const useSpatialCardAnimation = (transformationExamples) => {
 
     initialize();
 
-    const handleResize = () => {
-      // Debounce oder Throttle wäre hier ideal, aber für die Logik reicht das:
-      initialize();
-    };
-
+    const handleResize = () => initialize();
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -368,7 +442,12 @@ const useSpatialCardAnimation = (transformationExamples) => {
       spatialGridRef.current?.clear();
       clearAllTimeouts();
     };
-  }, [createNewCard, scheduleNextReplacement, transformationExamples]);
+  }, [
+    createNewCard,
+    scheduleNextReplacement,
+    transformationExamples,
+    getNewRandomIndex,
+  ]);
 
   return { flowingCards };
 };

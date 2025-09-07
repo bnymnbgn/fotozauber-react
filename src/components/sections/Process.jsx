@@ -1,3 +1,5 @@
+// Process.jsx - Mobile-First responsive Version mit verbesserter UX
+
 import { useState, useEffect, useRef } from "react";
 import {
   Upload,
@@ -7,7 +9,6 @@ import {
   CheckCircle,
   Clock,
   ArrowRight,
-  Camera,
   Sparkles,
   Heart,
   Zap,
@@ -19,10 +20,24 @@ const Process = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const timelineRef = useRef(null);
-  const stepsRef = useRef([]);
   const imageRefs = useRef([]);
+  const leftColumnRef = useRef(null);
+  const rightColumnRef = useRef(null);
 
+  // Screen size detection
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
+  // Daten der Schritte
   const steps = [
     {
       id: 1,
@@ -67,7 +82,7 @@ const Process = () => {
       description:
         "Wir erstellen ein detailliertes Konzept und zeigen Ihnen den geplanten Bearbeitungsweg.",
       details: [
-        "Detaillierte Konzeptzeichnung",
+        "Detaillierte Konzepterstellung",
         "Farbpalette & Stimmung festlegen",
         "Technische Machbarkeitsprüfung",
         "Zeitplanung besprechen",
@@ -106,7 +121,6 @@ const Process = () => {
         "Hochauflösende Vorschau-Datei",
         "Bis zu 3 Korrekturschleifen",
         "Detailliertes Feedback möglich",
-        "Live-Anpassungen per Video-Call",
       ],
       duration: "24 Stunden",
       color: "from-amber-500 to-amber-600",
@@ -142,8 +156,6 @@ const Process = () => {
         "Hochauflösende Qualität (300 DPI)",
         "Verschiedene Formate (JPEG, PNG, TIFF)",
         "Druckfertige Dateien bis A3",
-        "Lebenslanger Download-Zugang",
-        "Optional: Physische Prints",
       ],
       duration: "Sofort",
       color: "from-pink-500 to-pink-600",
@@ -153,264 +165,108 @@ const Process = () => {
     },
   ];
 
-  // GSAP Layer System Animation (PNG layers stack on top of each other)
+  // Animation logic
+  const animateSpecificLayer = (imgElement, stepIndex) => {
+    if (!imgElement) return;
+
+    // Simple CSS transitions for better mobile performance
+    imgElement.style.transition = "all 0.8s ease-out";
+    imgElement.style.opacity = "1";
+    imgElement.style.transform = "translateY(0px) scale(1)";
+  };
+
   const animateImageTransition = (stepIndex, immediate = false) => {
-    if (typeof window === "undefined" || !window.gsap) return;
-
-    const { gsap } = window;
-
-    console.log("🎬 ANIMATING STEP:", stepIndex, "Immediate:", immediate);
-
-    // Show all layers up to current step (cumulative)
     imageRefs.current.forEach((img, index) => {
       if (!img) return;
-
       if (index <= stepIndex) {
-        // Show this layer with proper z-index
-        gsap.set(img, {
-          zIndex: 10 + index, // Higher layers on top
-          display: "block",
-        });
-
-        // If this is the current step, animate it in
+        img.style.zIndex = 10 + index;
+        img.style.display = "block";
         if (index === stepIndex && !immediate) {
-          // Apply the specific animation for this step
-          animateSpecificLayer(img, index);
+          // Initial state for animation
+          img.style.opacity = "0";
+          img.style.transform = "translateY(20px) scale(0.95)";
+          // Trigger animation
+          setTimeout(() => animateSpecificLayer(img, index), 50);
         } else {
-          // Just make sure it's visible (already animated)
-          gsap.set(img, { opacity: 1 });
+          img.style.opacity = "1";
+          img.style.transform = "translateY(0px) scale(1)";
         }
       } else {
-        // Hide layers that come after current step
-        gsap.set(img, {
-          opacity: 0,
-          zIndex: 1,
-          display: "none",
-        });
+        img.style.opacity = "0";
+        img.style.zIndex = "1";
+        img.style.display = "none";
       }
     });
   };
 
-  // Specific animation for each layer
-  const animateSpecificLayer = (imgElement, stepIndex) => {
-    if (!window.gsap) return;
-    const { gsap } = window;
-
-    console.log("✅ ANIMATING LAYER:", stepIndex);
-
-    // Specific animations for each layer
-    switch (stepIndex) {
-      case 0: // Baby (Base layer) - Clean Fade In
-        gsap.fromTo(
-          imgElement,
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power2.out",
-          }
-        );
-        break;
-
-      case 1: // Background - Smooth Slide Up
-        gsap.fromTo(
-          imgElement,
-          { opacity: 0, y: 50, scaleY: 0.8 },
-          {
-            opacity: 1,
-            y: 0,
-            scaleY: 1,
-            duration: 1.2,
-            ease: "power3.out",
-          }
-        );
-        break;
-
-      case 2: // Additional Element - Scale & Rotate
-        gsap.fromTo(
-          imgElement,
-          { opacity: 0, scale: 0.7, rotation: -15 },
-          {
-            opacity: 1,
-            scale: 1,
-            rotation: 0,
-            duration: 1.0,
-            ease: "back.out(1.3)",
-          }
-        );
-        break;
-
-      case 3: // More Elements - Elegant Zoom In
-        gsap.fromTo(
-          imgElement,
-          {
-            opacity: 0,
-            scale: 1.3,
-            transformOrigin: "center bottom",
-          },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 1.4,
-            ease: "power2.out",
-          }
-        );
-        break;
-
-      case 4: // More Elements - Smooth Slide From Right
-        gsap.fromTo(
-          imgElement,
-          { opacity: 0, x: 100 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 1.1,
-            ease: "power3.out",
-          }
-        );
-        break;
-
-      case 5: // More Elements - Fluid Scale & Alpha
-        gsap.fromTo(
-          imgElement,
-          { opacity: 0, scale: 0.5 },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 1.3,
-            ease: "power4.out",
-          }
-        );
-        break;
-
-      case 6: // Final Layer - Perfect Final Reveal
-        gsap.fromTo(
-          imgElement,
-          {
-            opacity: 0,
-            scale: 1.2,
-            transformOrigin: "center center",
-          },
-          {
-            opacity: 1,
-            scale: 1,
-            duration: 1.6,
-            ease: "power3.out",
-          }
-        );
-        break;
-
-      default:
-        gsap.to(imgElement, {
-          opacity: 1,
-          duration: 0.5,
-          ease: "power2.out",
-        });
-    }
-  };
-
-  // Text Animation Timeline
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.gsap) {
-      const { gsap } = window;
-
-      const tl = gsap.timeline({ paused: true });
-
-      tl.from(".step-transition h4", {
-        opacity: 0,
-        x: 30,
-        duration: 0.5,
-        ease: "power3.out",
-      })
-        .from(
-          ".step-transition p",
-          {
-            opacity: 0,
-            y: 20,
-            duration: 0.4,
-            ease: "power2.out",
-          },
-          "-=0.3"
-        )
-        .from(
-          ".step-transition ul li",
-          {
-            opacity: 0,
-            x: -20,
-            duration: 0.3,
-            stagger: 0.1,
-            ease: "power2.out",
-          },
-          "-=0.2"
-        );
-
-      timelineRef.current = tl;
-    }
-  }, []);
-
-  // Initialize first image animation on mount
+  // Auto-play logic
   useEffect(() => {
     const timer = setTimeout(() => {
       animateImageTransition(0, true);
     }, 100);
-
     return () => clearTimeout(timer);
   }, []);
 
-  // Auto-advance steps with GSAP animation
   useEffect(() => {
     if (!isAutoPlaying) return;
-
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           setActiveStep((current) => {
             const nextStep = (current + 1) % steps.length;
-
-            // Trigger image and text animations
             animateImageTransition(nextStep, false);
-            if (timelineRef.current) {
-              timelineRef.current.restart();
-            }
-
             return nextStep;
           });
           return 0;
         }
-        return prev + 1; // Slower progression for better UX
+        return prev + 1;
       });
     }, 80);
-
     return () => clearInterval(interval);
   }, [isAutoPlaying, steps.length]);
 
-  // Pause auto-play on hover
+  // Height synchronization for desktop
+  useEffect(() => {
+    const setMatchingHeight = () => {
+      if (
+        leftColumnRef.current &&
+        rightColumnRef.current &&
+        window.innerWidth >= 1024
+      ) {
+        const leftHeight = leftColumnRef.current.offsetHeight;
+        rightColumnRef.current.style.height = `${leftHeight}px`;
+      } else if (rightColumnRef.current) {
+        rightColumnRef.current.style.height = "auto";
+      }
+    };
+
+    const timer = setTimeout(setMatchingHeight, 100);
+    window.addEventListener("resize", setMatchingHeight);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", setMatchingHeight);
+    };
+  }, [steps, activeStep]);
+
+  // Event Handlers
   const handleMouseEnter = () => setIsAutoPlaying(false);
   const handleMouseLeave = () => setIsAutoPlaying(true);
 
-  // Manual step selection with GSAP animation
   const handleStepClick = (index) => {
     setActiveStep(index);
     setProgress(0);
     setIsAutoPlaying(false);
-
-    // Trigger image and text animations
     animateImageTransition(index, false);
-    if (timelineRef.current) {
-      timelineRef.current.restart();
-    }
-
-    // Resume auto-play after 5 seconds
     setTimeout(() => setIsAutoPlaying(true), 5000);
   };
 
+  // Features data
   const features = [
     {
       icon: CheckCircle,
       title: "Zufriedenheitsgarantie",
-      description:
-        "Bis zu 3 kostenlose Korrekturen bis Sie 100% zufrieden sind",
+      description: "Wir kümmern uns um Sie, bis Sie 100% zufrieden sind",
     },
     {
       icon: Clock,
@@ -432,282 +288,252 @@ const Process = () => {
   return (
     <section
       id="process"
-      className="section-padding bg-gradient-to-br from-gray-50 to-white relative overflow-hidden"
+      className="py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden"
     >
-      {/* Hintergrund-Dekoration */}
+      {/* Background decoration */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-20 w-32 h-32 bg-blue-400 rounded-full blur-3xl"></div>
         <div className="absolute bottom-40 right-10 w-40 h-40 bg-purple-400 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 right-1/4 w-20 h-20 bg-pink-400 rounded-full blur-2xl"></div>
       </div>
 
-      <div className="container relative z-10">
+      <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12 md:mb-16">
           <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 rounded-full px-4 py-2 text-sm font-medium mb-6">
             <Sparkles className="w-4 h-4" />
             <span>SO FUNKTIONIERT ES</span>
           </div>
-
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Ihr Weg zur
+            Magische
             <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               Transformation
             </span>
           </h2>
-
           <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Von der ersten Idee bis zum fertigen Kunstwerk - so einfach und
             transparent ist der Weg zu Ihren magischen Erinnerungen.
           </p>
         </div>
 
-        {/* Interaktive Schritte */}
+        {/* Interactive Section */}
         <div
-          className="max-w-6xl mx-auto mb-20"
+          className="max-w-6xl mx-auto mb-16 md:mb-20"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          {/* Desktop Timeline */}
-          <div className="hidden lg:block">
-            <div className="relative">
-              {/* Timeline Line */}
-              <div className="absolute top-24 left-0 right-0 h-1 bg-gray-200 rounded-full">
-                <div
-                  className="h-full bg-gradient-to-r from-blue-500 via-green-500 via-purple-500 to-pink-500 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${
-                      ((activeStep + progress / 100) / steps.length) * 100
-                    }%`,
-                  }}
-                ></div>
-              </div>
-
-              {/* Progress Indicator for Current Step */}
-              <div className="absolute top-20 left-0 right-0 h-2 flex">
-                {steps.map((_, index) => (
-                  <div key={index} className="flex-1 mx-1">
-                    <div className="h-full bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          index === activeStep
-                            ? "bg-gradient-to-r from-blue-500 to-purple-500"
-                            : index < activeStep
-                            ? "bg-green-500"
-                            : "bg-gray-200"
-                        }`}
-                        style={{
-                          width:
-                            index === activeStep
-                              ? `${progress}%`
-                              : index < activeStep
-                              ? "100%"
-                              : "0%",
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Steps */}
-              <div className="grid grid-cols-7 gap-4">
+          {/* Mobile Layout */}
+          <div className="lg:hidden">
+            {/* Mobile: Icons oberhalb des Bildes */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-4 px-2">
                 {steps.map((step, index) => {
                   const IconComponent = step.icon;
                   const isActive = activeStep === index;
-                  const isCompleted = activeStep > index;
 
                   return (
-                    <div
+                    <button
                       key={step.id}
-                      className={`relative cursor-pointer transition-all duration-300 ${
-                        isActive ? "transform scale-105" : ""
-                      }`}
                       onClick={() => handleStepClick(index)}
+                      className={`p-2 md:p-3 rounded-xl transition-all duration-300 relative ${
+                        isActive
+                          ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg scale-110"
+                          : "bg-white text-gray-400 shadow-sm hover:text-gray-600 hover:shadow-md"
+                      }`}
                     >
-                      {/* Step Circle */}
+                      <IconComponent className="w-4 h-4 md:w-5 md:h-5" />
+                      {/* Step number indicator */}
                       <div
-                        className={`relative z-10 w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center transition-all duration-500 transform ${
-                          isActive || isCompleted
-                            ? `bg-gradient-to-br ${step.color} shadow-lg scale-110`
-                            : "bg-white border-2 border-gray-300 hover:scale-105"
+                        className={`absolute -top-2 -right-2 w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center ${
+                          isActive
+                            ? "bg-white text-purple-600 shadow-md"
+                            : "bg-gray-200 text-gray-500"
                         }`}
                       >
-                        {/* Pulsing animation for active step */}
-                        {isActive && (
-                          <div
-                            className={`absolute inset-0 rounded-full bg-gradient-to-br ${step.color} opacity-30 animate-ping`}
-                          ></div>
-                        )}
-                        <IconComponent
-                          className={`w-8 h-8 ${
-                            isActive || isCompleted
-                              ? "text-white"
-                              : "text-gray-400"
-                          }`}
-                        />
-
-                        {/* Step Number */}
-                        <div
-                          className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            isActive || isCompleted
-                              ? "bg-white text-gray-900"
-                              : "bg-gray-300 text-gray-600"
-                          }`}
-                        >
-                          {step.id}
-                        </div>
+                        {index + 1}
                       </div>
-
-                      {/* Step Content */}
-                      <div className="text-center">
-                        <h3
-                          className={`text-lg font-bold mb-2 transition-colors duration-300 ${
-                            isActive ? "text-gray-900" : "text-gray-600"
-                          }`}
-                        >
-                          {step.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 mb-3">
-                          {step.description}
-                        </p>
-                        <div
-                          className={`inline-flex items-center space-x-1 text-xs font-medium px-2 py-1 rounded-full ${
-                            isActive ? step.bgColor : "bg-gray-100"
-                          }`}
-                        >
-                          <Clock className="w-3 h-3" />
-                          <span>{step.duration}</span>
-                        </div>
-                      </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
+
+              {/* Mobile: Horizontaler Progress Indicator */}
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-100 ease-linear"
+                  style={{
+                    width: `${(progress + activeStep * 100) / steps.length}%`,
+                  }}
+                ></div>
+              </div>
             </div>
 
-            {/* Active Step Details */}
-            <div className="mt-12 bg-white rounded-2xl shadow-lg p-8 transition-all duration-500">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div className="step-transition">
-                  <h4 className="text-2xl font-bold text-gray-900 mb-4">
-                    {steps[activeStep].title}
-                  </h4>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
-                    {steps[activeStep].description}
-                  </p>
+            {/* Mobile: Größeres Bild mit Overlay */}
+            <div className="relative rounded-2xl overflow-hidden shadow-xl bg-gray-100 aspect-[3/4] mb-6">
+              {/* Bild-Container */}
+              <div className="w-full h-full">
+                {steps.map((step, index) => (
+                  <img
+                    key={index}
+                    src={step.image}
+                    alt={step.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    ref={(el) => (imageRefs.current[index] = el)}
+                    style={{
+                      opacity: 0,
+                      display: "none",
+                    }}
+                  />
+                ))}
+              </div>
 
-                  <ul className="space-y-3">
-                    {steps[activeStep].details.map((detail, index) => (
-                      <li key={index} className="flex items-center space-x-3">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                        <span className="text-gray-700">{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <div className="mt-6 flex items-center space-x-3">
-                    <Clock className="w-5 h-5 text-gray-500" />
-                    <span className="text-gray-700 font-medium">
-                      Dauer: {steps[activeStep].duration}
-                    </span>
+              {/* Mobile: Overlay mit Step-Info */}
+              <div className="absolute inset-0 bg-gradient-to-t via-transparent to-transparent"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+                    {(() => {
+                      const IconComponent = steps[activeStep].icon;
+                      return <IconComponent className="w-5 h-5" />;
+                    })()}
+                  </div>
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold drop-shadow-lg">
+                      {activeStep + 1}. {steps[activeStep].title}
+                    </h3>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Clock className="w-4 h-4 text-gray-200" />
+                      <span className="text-sm text-gray-200 font-medium">
+                        {steps[activeStep].duration}
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <p className="text-base md:text-lg text-gray-100 leading-relaxed mt-3 drop-shadow-md font-medium">
+                  {steps[activeStep].description}
+                </p>
+              </div>
+            </div>
 
-                <div className="aspect-square rounded-2xl overflow-hidden shadow-lg relative group">
-                  <div className="w-full h-full relative">
-                    {steps.map((step, index) => (
-                      <img
-                        key={index}
-                        src={step.image}
-                        alt={step.title}
-                        className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110"
-                        ref={(el) => (imageRefs.current[index] = el)}
-                        style={{
-                          opacity: index <= activeStep ? 1 : 0,
-                          zIndex: 10 + index,
-                          display: index <= activeStep ? "block" : "none",
-                        }}
-                      />
-                    ))}
-                  </div>
-                  {/* Overlay with icon */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent">
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <div className="flex items-center space-x-3">
-                        <div
-                          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${steps[activeStep].color} flex items-center justify-center`}
-                        >
-                          {(() => {
-                            const IconComponent = steps[activeStep].icon;
-                            return (
-                              <IconComponent className="w-6 h-6 text-white" />
-                            );
-                          })()}
-                        </div>
-                        <div>
-                          <h5 className="text-white font-semibold">
-                            Schritt {steps[activeStep].id}
-                          </h5>
-                          <p className="text-white/80 text-sm">
-                            {steps[activeStep].title}
-                          </p>
-                        </div>
-                      </div>
+            {/* Mobile: Details unterhalb des Bildes */}
+            <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg">
+              <h4 className="text-lg font-bold text-gray-900 mb-4">
+                Was passiert in diesem Schritt:
+              </h4>
+              <ul className="space-y-2">
+                {steps[activeStep].details.map((detail, index) => (
+                  <li key={index} className="flex items-start space-x-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 text-sm leading-relaxed">
+                      {detail}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Desktop Layout (unchanged) */}
+          <div className="hidden lg:grid lg:grid-cols-12 gap-x-12 gap-y-8 items-start">
+            {/* Desktop: Image Column */}
+            <div
+              ref={rightColumnRef}
+              className="lg:col-span-7 lg:sticky lg:top-24"
+            >
+              <div className="rounded-2xl shadow-xl h-full relative overflow-hidden bg-gray-100 group">
+                <div className="w-full h-full">
+                  {steps.map((step, index) => (
+                    <img
+                      key={index}
+                      src={step.image}
+                      alt={step.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      ref={(el) => (imageRefs.current[index] = el)}
+                      style={{
+                        opacity: 0,
+                        display: "none",
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <div className="absolute bottom-0 left-0 w-full z-20 step-transition p-6 md:p-8 pointer-events-none">
+                  <div>
+                    <ul className="space-y-2 mt-4 mb-5">
+                      {steps[activeStep].details.map((detail, index) => (
+                        <li key={index} className="flex items-center space-x-3">
+                          <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 drop-shadow-sm" />
+                          <span className="text-gray-100 drop-shadow-sm">
+                            {detail}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-6 flex items-center space-x-3 bg-white/10 p-3 rounded-lg border border-white/20 backdrop-blur-sm">
+                      <Clock className="w-5 h-5 text-gray-900 flex-shrink-0" />
+                      <span className="font-medium text-sm text-gray-900">
+                        Geschätzte Dauer für diesen Schritt:{" "}
+                        <span className="font-bold">
+                          {steps[activeStep].duration}
+                        </span>
+                      </span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Mobile Version */}
-          <div className="lg:hidden space-y-8">
-            {steps.map((step, index) => {
-              const IconComponent = step.icon;
+            {/* Desktop: Steps Column */}
+            <div ref={leftColumnRef} className="lg:col-span-5 space-y-4">
+              {steps.map((step, index) => {
+                const IconComponent = step.icon;
+                const isActive = activeStep === index;
 
-              return (
-                <div
-                  key={step.id}
-                  className="bg-white rounded-2xl shadow-lg p-6"
-                >
-                  <div className="flex items-start space-x-4">
-                    <div
-                      className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center flex-shrink-0`}
-                    >
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="text-lg font-bold text-gray-900">
-                          {step.title}
-                        </h3>
-                        <span
-                          className={`text-xs font-medium px-2 py-1 rounded-full ${step.bgColor}`}
-                        >
-                          {step.duration}
-                        </span>
+                return (
+                  <button
+                    key={step.id}
+                    onClick={() => handleStepClick(index)}
+                    className={`w-full text-left p-4 rounded-2xl transition-all duration-300 border ${
+                      isActive
+                        ? "bg-white shadow-xl scale-[1.02] border-purple-200 ring-1 ring-purple-100"
+                        : "bg-gray-50 border-transparent hover:bg-white hover:shadow-lg hover:border-gray-200"
+                    }`}
+                  >
+                    <div className="flex space-x-4">
+                      <div
+                        className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                          isActive
+                            ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-md"
+                            : "bg-gray-200 text-gray-600"
+                        }`}
+                      >
+                        <IconComponent className="w-6 h-6" />
                       </div>
-
-                      <p className="text-gray-600 mb-4">{step.description}</p>
-
-                      <ul className="space-y-2">
-                        {step.details.map((detail, idx) => (
-                          <li
-                            key={idx}
-                            className="flex items-center space-x-2 text-sm text-gray-700"
-                          >
-                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                            <span>{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div>
+                        <h3
+                          className={`font-bold text-base transition-colors ${
+                            isActive ? "text-gray-900" : "text-gray-700"
+                          }`}
+                        >
+                          {index + 1}. {step.title}
+                        </h3>
+                        <p className="text-sm text-gray-500 leading-snug mt-1">
+                          {step.description}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+
+                    {isActive && (
+                      <div className="mt-4 h-1 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-100 ease-linear"
+                          style={{ width: `${progress}%` }}
+                        ></div>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -715,7 +541,6 @@ const Process = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
-
             return (
               <div
                 key={index}
@@ -744,30 +569,12 @@ const Process = () => {
             Starten Sie noch heute Ihre magische Transformation. Der Upload
             Ihrer Bilder dauert nur wenige Minuten.
           </p>
-
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              className="bg-white text-purple-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
-              onClick={() => {
-                const element = document.querySelector("#contact");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-            >
+            <button className="bg-white text-purple-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
               Jetzt Bilder hochladen
               <ArrowRight className="w-5 h-5 ml-2 inline" />
             </button>
-
-            <button
-              className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-semibold py-4 px-8 rounded-full transition-all duration-300"
-              onClick={() => {
-                const element = document.querySelector("#gallery");
-                if (element) {
-                  element.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-            >
+            <button className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-semibold py-4 px-8 rounded-full transition-all duration-300">
               Beispiele ansehen
             </button>
           </div>

@@ -1,15 +1,16 @@
-import { useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
-import { cn } from '../../utils/cn';
+// Modal.jsx (updated)
+import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+import { cn } from "../../utils/cn";
 
-const Modal = ({ 
-  isOpen, 
-  onClose, 
-  children, 
-  className = '',
+const Modal = ({
+  isOpen,
+  onClose,
+  children,
+  className = "",
   showCloseButton = true,
-  closeOnOverlayClick = true 
+  closeOnOverlayClick = true,
 }) => {
   // Handle ESC key press
   useEffect(() => {
@@ -20,10 +21,21 @@ const Modal = ({
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEsc);
-      return () => document.removeEventListener('keydown', handleEsc);
+      document.addEventListener("keydown", handleEsc);
+      return () => document.removeEventListener("keydown", handleEsc);
     }
   }, [isOpen, onClose]);
+
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Nur Scrollen deaktivieren ohne Position zu ändern
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [isOpen]);
 
   const handleOverlayClick = (e) => {
     if (closeOnOverlayClick && e.target === e.currentTarget) {

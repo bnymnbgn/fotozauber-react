@@ -105,20 +105,21 @@ const About = () => {
           <div className="space-y-6">
             <div className="space-y-4">
               <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
-                Hallo, ich bin Noha
+                Guten Tag, ich bin Noha.
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Als Mutter von zwei wundervollen Kindern weiß ich, wie schnell
-                die magischen Momente der Kindheit vergehen. Meine Leidenschaft
-                liegt darin, diese kostbaren Augenblicke nicht nur festzuhalten,
-                sondern sie in märchenhafte Kunstwerke zu verwandeln.
+                Als Vater eines wundervollen Kindes kenne ich aus eigener
+                Erfahrung, wie flüchtig die magischen Momente der Kindheit sind.
+                Meine Leidenschaft gilt der Aufgabe, diese kostbaren Augenblicke
+                nicht nur festzuhalten, sondern sie in zauberhafte Kunstwerke zu
+                verwandeln.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Mit über 5 Jahren Erfahrung in der digitalen Bildbearbeitung und
-                einem Hintergrund in Grafikdesign bringe ich sowohl technisches
-                Know-how als auch künstlerische Vision in jedes Projekt ein.
-                Jede Transformation ist für mich eine neue Gelegenheit,
-                Kinderaugen zum Leuchten zu bringen.
+                Mit mehr als 15 Jahren Expertise in der digitalen
+                Bildbearbeitung und einem fundierten IT-Hintergrund verbinde ich
+                technisches Know-how mit künstlerischer Vision in jedem Projekt.
+                Jede Bearbeitung ist für mich eine Chance, Kinderaugen zum
+                Strahlen zu bringen und bleibende Erinnerungen zu schaffen.
               </p>
             </div>
 

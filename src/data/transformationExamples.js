@@ -40,7 +40,7 @@ export const transformationExamples = [
     alt: "Baby mit Sternen",
   },
   {
-    before: "/assets/img/klem before.jpg",
+    before: "/assets/img/klem before.JPG",
     after: "/assets/img/klem after.jpg",
     alt: "Kind als Kapitän",
   },
