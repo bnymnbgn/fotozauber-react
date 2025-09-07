@@ -38,6 +38,26 @@
   .bg-gradient-secondary {
     @apply bg-gradient-to-r from-secondary-600 to-secondary-700;
   }
+
+  .aurora-logo-container {
+    /* 1. Definieren Sie die Größe des Logo-Containers */
+    width: 300px; /* Passen Sie Breite an Ihr Logo an */
+    height: 150px; /* Passen Sie Höhe an Ihr Logo an */
+
+    /* 2. Wenden Sie das Logo als Maske an */
+    /* Stellen Sie sicher, dass der Pfad zu Ihrem Logo korrekt ist */
+    mask-image: url("assets/logo.svg");
+    mask-size: contain; /* Stellt sicher, dass das gesamte Logo in den Container passt */
+    mask-repeat: no-repeat;
+    mask-position: center;
+
+    /* Webkit-Präfix für maximale Kompatibilität (Safari) */
+    -webkit-mask-image: url("assets/logo.svg");
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+  }
+  /* --- HIER EINFÜGEN ENDE --- */
 }
 
 @layer utilities {
@@ -46,8 +66,9 @@
   }
 
   .backdrop-blur-glass {
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+    transform: translateZ(0);
   }
 
   .line-clamp-2 {
@@ -82,15 +103,18 @@
   .image-container {
     transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
     transform-style: preserve-3d !important;
-    will-change: transform !important;
     position: absolute;
     transform-origin: center center;
     transform-box: border-box;
   }
 
-  /* Original Hover-Effekt: Scale + Rotation zurücksetzen + z-index */
   .image-container:hover {
-    transform: scale(1.08) rotate(0deg) translateZ(90px) !important;
+    will-change: transform !important;
+  }
+
+  /* Original Hover-Effekt: Vereinfachter Scale mit GPU-Beschleunigung */
+  .image-container:hover {
+    transform: scale(1.08) translateZ(0) !important;
     z-index: 10 !important;
     border: 4px solid transparent !important;
     background: linear-gradient(white, white) padding-box,
@@ -103,7 +127,7 @@
   }
 
   .image-container:hover .hero-image {
-    transform: scale(1.12);
+    transform: scale(1.12) translateZ(0);
   }
 
   /* Hero Section Styles */
@@ -127,17 +151,17 @@
     53%,
     80%,
     100% {
-      transform: translateX(-50%) translateY(0);
+      transform: translateX(-50%) translateY(0) translateZ(0);
     }
     40%,
     43% {
-      transform: translateX(-50%) translateY(-10px);
+      transform: translateX(-50%) translateY(-10px) translateZ(0);
     }
     70% {
-      transform: translateX(-50%) translateY(-5px);
+      transform: translateX(-50%) translateY(-5px) translateZ(0);
     }
     90% {
-      transform: translateX(-50%) translateY(-2px);
+      transform: translateX(-50%) translateY(-2px) translateZ(0);
     }
   }
 }
@@ -151,28 +175,33 @@
   @keyframes endless-cycle {
     0% {
       opacity: 0;
-      transform: scale(0.5) translateY(0);
+      transform: scale(0.5) translateY(0) translateZ(0);
     }
-    6% {
+    2% {
       opacity: 1;
-      transform: scale(1) translateY(0);
+      transform: scale(1) translateY(0) translateZ(0);
     }
     100% {
       opacity: 1;
-      transform: scale(1) translateY(-75vh);
+      transform: scale(1) translateY(-75vh) translateZ(0);
     }
   }
+
+  .flowing-card {
+    opacity: 0;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+  }
+
   /* --- Responsive Anpassungen --- */
   @media (max-width: 768px) {
     .flowing-card {
-      /* Macht die Karten auf kleineren Bildschirmen etwas kleiner, um Platz zu sparen */
-      transform: scale(0.8) translateZ(0);
+      transform: scale(0.8);
     }
   }
 
   /* --- Barrierefreiheit: Animationen für Nutzer reduzieren, die dies wünschen --- */
   @media (prefers-reduced-motion: reduce) {
-    /* Reduziert die Animation auf ein Minimum, anstatt sie komplett zu stoppen */
     .flowing-card {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
@@ -182,5 +211,15 @@
     .particle {
       animation: none !important;
     }
+  }
+}
+
+/* NEU: Separate Keyframes für schnelles Einblenden */
+@keyframes fast-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

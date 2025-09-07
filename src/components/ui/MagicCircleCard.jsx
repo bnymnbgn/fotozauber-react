@@ -10,25 +10,23 @@ const MagicCircleCard = ({
   transformationDuration = 800,
 }) => {
   const [isTransformed, setIsTransformed] = useState(false);
-  const [isFading, setIsFading] = useState(false);
 
   useEffect(() => {
+    // Setzt den Zustand für jede neue Karte zurück
     setIsTransformed(false);
-    setIsFading(false);
 
+    // Startet die Transformation nach der vorgegebenen Verzögerung
     const transformTimer = setTimeout(() => {
       setIsTransformed(true);
-
-      const fadeTimer = setTimeout(() => {
-        setIsFading(true);
-      }, 3000); // 3 seconds hold after transformation
-
-      return () => clearTimeout(fadeTimer);
     }, transformationDelay);
 
+    // Bereinigt den Timer, wenn die Komponente verschwindet
     return () => clearTimeout(transformTimer);
   }, [beforeSrc, afterSrc, transformationDelay]);
 
+  // HINWEIS: Die 'animate' und 'exit' Props wurden entfernt.
+  // Die Steuerung des Ein- und Ausblendens übernimmt jetzt die CSS-Animation
+  // und die Hero-Komponente, was stabiler ist.
   return (
     <motion.button
       onClick={onClick}
@@ -41,8 +39,6 @@ const MagicCircleCard = ({
         transition: { duration: 0.3 },
       }}
       whileTap={{ scale: 0.95 }}
-      animate={{ opacity: isFading ? 0 : 1 }}
-      transition={{ duration: isFading ? 1 : 0 }}
     >
       <div className="relative w-full h-full">
         <img
