@@ -1,5 +1,5 @@
 import { ArrowRight, Sparkles } from "lucide-react";
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagicCircleCard from "../ui/MagicCircleCard";
 import HoverComparisonSlider from "../ui/HoverComparisonSlider";
@@ -7,31 +7,20 @@ import Button from "../ui/Button";
 import Lightbox from "../ui/Lightbox";
 import { transformationExamples } from "../../data/transformationExamples";
 import useSpatialCardAnimation from "../../hooks/useSpatialCardAnimation";
+import { AuroraText } from "@/components/magicui/aurora-text";
 
 // --- Custom Hook für Barrierefreiheit ---
-/**
- * Prüft die Betriebssystemeinstellung des Benutzers für reduzierte Bewegung.
- * @returns {boolean} True, wenn der Benutzer reduzierte Bewegung bevorzugt.
- */
 const usePrefersReducedMotion = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
   useEffect(() => {
     const mediaQueryList = window.matchMedia(
       "(prefers-reduced-motion: reduce)"
     );
     setPrefersReducedMotion(mediaQueryList.matches);
-
-    const listener = (event) => {
-      setPrefersReducedMotion(event.matches);
-    };
-
+    const listener = (event) => setPrefersReducedMotion(event.matches);
     mediaQueryList.addEventListener("change", listener);
-    return () => {
-      mediaQueryList.removeEventListener("change", listener);
-    };
+    return () => mediaQueryList.removeEventListener("change", listener);
   }, []);
-
   return prefersReducedMotion;
 };
 
@@ -40,31 +29,40 @@ const rotatingWords = [
   "Einzigartig",
   "Liebevoll",
   "Individuell",
-  "Träume",
+  "Sicher",
+  "Traumhaft",
   "Magisch",
   "Fantasievoll",
+  "Zauberhaft",
+  "Authentisch",
+  "Inspirierend",
+  "Herzlich",
+  "Kreativ",
+  "Fröhlich",
+  "Anonym",
+  "Wundervoll",
+  "Strahlend",
+  "Bezaubernd",
+  "Harmonisch",
+  "Lebendig",
 ];
 
 // --- Hauptkomponente ---
-const Hero = () => {
+const Hero = memo(() => {
   const [particles, setParticles] = useState([]);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentLightboxIndex, setCurrentLightboxIndex] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
-
+  const [isInView, setIsInView] = useState(false);
   const heroRef = useRef(null);
-  const { flowingCards } = useSpatialCardAnimation(transformationExamples);
-
-  // Hook für Barrierefreiheit initialisieren
+  const { flowingCards, startAnimation, stopAnimation } = useSpatialCardAnimation(transformationExamples);
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Partikelgenerierung, abhängig von prefersReducedMotion
   useEffect(() => {
     if (prefersReducedMotion) {
-      setParticles([]); // Keine Partikel bei reduzierter Bewegung
+      setParticles([]);
       return;
     }
-
     const newParticles = Array.from({ length: 12 }).map(() => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
@@ -73,44 +71,64 @@ const Hero = () => {
       size: `${1 + Math.random() * 1.5}px`,
     }));
     setParticles(newParticles);
-  }, [prefersReducedMotion]); // Neu: Abhängigkeit hinzugefügt
+  }, [prefersReducedMotion]);
 
-  // Performance-Optimierung: Maus-Glow über CSS-Variablen statt React-State steuern
+  // Intersection Observer for viewport detection
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const visible = entry.isIntersecting;
+        setIsInView(visible);
+        
+        if (visible && !prefersReducedMotion) {
+          startAnimation();
+        } else {
+          stopAnimation();
+        }
+      },
+      {
+        threshold: 0.1, // Start when 10% is visible
+        rootMargin: '-10% 0px -10% 0px' // Slightly reduce viewport
+      }
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+
+    return () => {
+      if (heroRef.current) {
+        observer.unobserve(heroRef.current);
+      }
+      stopAnimation();
+    };
+  }, [prefersReducedMotion]);
+
   useEffect(() => {
     const heroElement = heroRef.current;
     if (!heroElement) return;
-
     const handleMouseMove = (e) => {
       const { clientX, clientY } = e;
       const { left, top } = heroElement.getBoundingClientRect();
       heroElement.style.setProperty("--glow-x", `${clientX - left}px`);
       heroElement.style.setProperty("--glow-y", `${clientY - top}px`);
     };
-
-    // Nur den Listener hinzufügen, wenn Bewegung nicht reduziert ist
     if (!prefersReducedMotion) {
       heroElement.addEventListener("mousemove", handleMouseMove);
     }
-
     return () => {
       if (heroElement) {
         heroElement.removeEventListener("mousemove", handleMouseMove);
       }
     };
-  }, [prefersReducedMotion]); // Neu: Abhängigkeit hinzugefügt
+  }, [prefersReducedMotion]);
 
-  // Wortrotation
   useEffect(() => {
     const interval = setInterval(() => {
       setWordIndex((prevIndex) => (prevIndex + 1) % rotatingWords.length);
-    }, 2000); // Dauer der Wortanzeige
-
+    }, 2000);
     return () => clearInterval(interval);
   }, []);
-
-  // Event Handlers
-  const handleScrollToContact = () =>
-    document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
 
   const openLightbox = (index) => {
     setCurrentLightboxIndex(index);
@@ -121,37 +139,25 @@ const Hero = () => {
   return (
     <>
       <style>{`
-        @keyframes aurora-text { 
-          0% { background-position: 0% 50%; } 
-          50% { background-position: 100% 50%; } 
-          100% { background-position: 0% 50%; } 
-        }
-        .animated-gradient-text { 
-          background-size: 200% auto; 
-          animation: aurora-text 5s ease-in-out infinite; 
-        }
+        @keyframes aurora-text { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .animated-gradient-text { background-size: 200% auto; animation: aurora-text 5s ease-in-out infinite; }
         @keyframes twinkle { 0%, 100% { opacity: 0; } 50% { opacity: 0.8; } }
         .particle { animation-name: twinkle; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
         .flowing-card { opacity: 0; will-change: transform, opacity; }
-
-        /* Barrierefreiheit: Animationen im CSS deaktivieren, falls prefersReducedMotion aktiv ist */
-        @media (prefers-reduced-motion: reduce) {
-          .animated-gradient-text { animation: none; }
-          .particle { animation: none; opacity: 0.3; }
-        }
+        @media (prefers-reduced-motion: reduce) { .animated-gradient-text { animation: none; } .particle { animation: none; opacity: 0.3; } }
       `}</style>
 
       <section
         ref={heroRef}
         id="home"
-        className="relative flex items-center justify-center min-h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 px-4"
+        className="relative flex items-center justify-center min-h-[100vh] overflow-hidden bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 px-4"
       >
-        {/* Hintergrund-Effekte: Glow-Effekt liest jetzt CSS-Variablen */}
+        {/* Hintergrund-Effekte */}
         <div
           className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-500"
           style={{
             background: `radial-gradient(600px at var(--glow-x, 50%) var(--glow-y, 50%), rgba(167, 139, 250, 0.15), transparent 80%)`,
-            opacity: prefersReducedMotion ? 0 : 1, // Glow deaktivieren bei Reduce Motion
+            opacity: prefersReducedMotion ? 0 : 1,
           }}
         />
         <div className="absolute inset-0 z-10 pointer-events-none">
@@ -173,7 +179,7 @@ const Hero = () => {
           ))}
         </div>
 
-        {/* Fließende Karten: Animation wird vom Hook useSpatialCardAnimation gesteuert, idealerweise berücksichtigt dieser auch prefersReducedMotion */}
+        {/* Fließende Karten */}
         <div className="absolute inset-0 z-20">
           {flowingCards.map((card) => (
             <div
@@ -192,7 +198,7 @@ const Hero = () => {
           ))}
         </div>
 
-        {/* Textinhalt: Animationen respektieren prefersReducedMotion */}
+        {/* Textinhalt */}
         <motion.div
           className="relative z-30 flex flex-col items-center max-w-6xl text-center"
           initial={{
@@ -206,14 +212,11 @@ const Hero = () => {
             <span>FOTOGRAFIE TRIFFT FANTASIE</span>
           </div>
 
-          <div
-            className="
-    aurora-logo-container 
-    animated-gradient-text 
-    bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400
-  "
-          ></div>
-          <div className="relative h-32 md:h-36 lg:h-40 overflow-hidden text-center mb-4 w-full">
+          <div className="aurora-logo-container animated-gradient-text bg-gradient-to-bl from-fuchsia-500 via-violet-600 to-blue-400"></div>
+
+          {/* --- KORRIGIERTER CONTAINER --- */}
+          {/* overflow-hidden entfernt und Höhe (h-XX) erhöht, um Umbruch zu ermöglichen */}
+          <div className="relative h-64 md:h-72 lg:h-80 text-center mb-4 w-full ">
             <AnimatePresence mode="wait">
               <motion.span
                 key={wordIndex}
@@ -224,25 +227,11 @@ const Hero = () => {
                   duration: prefersReducedMotion ? 0 : 0.5,
                   ease: "easeInOut",
                 }}
-                className="absolute inset-0 text-6xl md:text-8xl lg:text-9xl text-white/90 font-bold flex items-center justify-center whitespace-nowrap"
+                className="absolute inset-0 text-6xl md:text-8xl lg:text-9xl text-white/90 font-bold flex items-center justify-center"
               >
                 {rotatingWords[wordIndex]}
               </motion.span>
             </AnimatePresence>
-          </div>
-
-          <p className="mt-6 text-lg text-white/80 max-w-prose mx-auto">
-            Wir verwandeln deine wertvollsten Kinderfotos in atemberaubende
-            Kunstwerke, die die Fantasie beflügeln und ein Leben lang Freude
-            bereiten.
-          </p>
-          <div className="mt-10">
-            <Button onClick={handleScrollToContact}>
-              <span className="flex items-center">
-                Deine Transformation starten{" "}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </span>
-            </Button>
           </div>
         </motion.div>
       </section>
@@ -250,12 +239,11 @@ const Hero = () => {
       {/* Lightbox Sektion */}
       <Lightbox isOpen={lightboxOpen} onClose={closeLightbox}>
         <div className="w-full max-w-5xl mx-auto p-4">
-          {/* --- ANPASSUNG HIER --- */}
           <HoverComparisonSlider
             beforeImage={transformationExamples[currentLightboxIndex].before}
             afterImage={transformationExamples[currentLightboxIndex].after}
             title={transformationExamples[currentLightboxIndex].alt}
-            enforceAspectRatio={false} // HIER: Originalgröße im Modal erzwingen
+            enforceAspectRatio={false}
           />
           <p className="mt-4 text-center text-white text-lg">
             {transformationExamples[currentLightboxIndex].alt}
@@ -264,6 +252,8 @@ const Hero = () => {
       </Lightbox>
     </>
   );
-};
+});
+
+Hero.displayName = 'Hero';
 
 export default Hero;

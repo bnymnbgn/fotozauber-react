@@ -1,12 +1,73 @@
-// Comparison.jsx (updated)
-import { useState, useRef, useCallback } from "react";
-import { Timer, Sparkles, Eye, Maximize, X } from "lucide-react"; // X hinzugefügt
+import { useState, useEffect, memo } from "react";
+import { Timer, Sparkles, Eye, X } from "lucide-react";
 import Modal from "../ui/Modal";
 import { comparisons } from "../../data/content";
 import HoverComparisonSlider from "../ui/HoverComparisonSlider";
+import CustomSwiper from "../ui/CustomSwiper";
 
-// --- Hauptsektion-Komponente ---
-const HoverComparisonSection = () => {
+const statsData = [
+  {
+    id: 1,
+    icon: Sparkles,
+    gradient: "from-purple-500 to-pink-500",
+    value: "500+",
+    title: "Transformierte Bilder",
+    description: "Professionelle Bearbeitung für beeindruckende Ergebnisse.",
+  },
+  {
+    id: 2,
+    icon: Timer,
+    gradient: "from-blue-500 to-purple-500",
+    value: "24h",
+    title: "Express-Service verfügbar",
+    description: "Schnelle Ergebnisse, wann immer Sie sie brauchen.",
+  },
+  {
+    id: 3,
+    icon: Eye,
+    gradient: "from-green-500 to-blue-500",
+    value: "100%",
+    title: "Kundenzufriedenheit",
+    description: "Unsere Kunden lieben die Qualität unserer Arbeit.",
+  },
+];
+
+// Die StatCard für den Desktop-Grid (bleibt unverändert)
+const StatCard = ({ stat }) => {
+  const IconComponent = stat.icon;
+  return (
+    <div className="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-100 h-full">
+      <div
+        className={`w-16 h-16 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
+      >
+        <IconComponent className="w-8 h-8 text-white" />
+      </div>
+      <h3 className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</h3>
+      <p className="text-gray-600 font-medium">{stat.title}</p>
+      <p className="text-gray-500 text-sm mt-1">{stat.description}</p>
+    </div>
+  );
+};
+
+// NEU: Eine Funktion, die nur den *Inhalt* für die mobile Slider-Karte rendert
+const renderStatCardContent = (stat) => {
+  const IconComponent = stat.icon;
+  return (
+    <div className="text-center p-6">
+      <div
+        className={`w-16 h-16 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
+      >
+        <IconComponent className="w-8 h-8 text-white" />
+      </div>
+      <h3 className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</h3>
+      <p className="text-gray-600 font-medium">{stat.title}</p>
+      <p className="text-gray-500 text-sm mt-1">{stat.description}</p>
+    </div>
+  );
+};
+
+const HoverComparisonSection = memo(() => {
+  // ... (Hooks und Funktionen bleiben unverändert)
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedComparison, setSelectedComparison] = useState(null);
 
@@ -23,7 +84,7 @@ const HoverComparisonSection = () => {
   return (
     <section className="py-20 sm:py-32 bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
       <div className="container relative z-10 mx-auto px-4 max-w-7xl">
-        {/* Header (unverändert) */}
+        {/* ... (Header und Comparison Grid bleiben unverändert) ... */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full px-5 py-2 text-sm font-medium mb-6">
             <Timer className="w-4 h-4" />
@@ -37,8 +98,6 @@ const HoverComparisonSection = () => {
             Verbesserungen zu erleben. Klicken Sie, um die Details zu erkunden.
           </p>
         </div>
-
-        {/* Comparison Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {comparisons.map((comparison) => (
             <HoverComparisonSlider
@@ -52,34 +111,38 @@ const HoverComparisonSection = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-100">
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-2">500+</h3>
-            <p className="text-gray-600 font-medium">Transformierte Bilder</p>
-          </div>
-          <div className="text-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-100">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Timer className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-2">24h</h3>
-            <p className="text-gray-600 font-medium">
-              Express-Service verfügbar
-            </p>
-          </div>
-          <div className="text-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-100">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <Eye className="w-8 h-8 text-white" />
-            </div>
-            <h3 className="text-3xl font-bold text-gray-900 mb-2">99.9%</h3>
-            <p className="text-gray-600 font-medium">Kundenzufriedenheit</p>
-          </div>
+        <div className="md:hidden">
+          <CustomSwiper
+            items={statsData}
+            // Wir übergeben die Container-Styles an die Slide
+            slideClassName="flex items-center justify-center rounded-2xl bg-white shadow-xl"
+            // und rendern nur noch den Inhalt
+            renderSlide={renderStatCardContent}
+            effect="cards"
+            className="w-full h-[380px]"
+            swiperProps={{
+              style: {
+                paddingBottom: "50px",
+              },
+            }}
+          />
         </div>
 
-        {/* CTA Section */}
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
+          {statsData.map((stat) => (
+            <StatCard key={stat.id} stat={stat} />
+          ))}
+        </div>
+
+        {/* ... (CTA und Modal bleiben unverändert) ... */}
         <div className="text-center mt-16">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            Starten Sie Ihre Transformation
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-xl mx-auto">
+            Laden Sie Ihr Bild hoch und erleben Sie die Magie unserer
+            Bearbeitung
+          </p>
           <button className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
             <span>Jetzt kostenlos testen</span>
             <svg
@@ -98,8 +161,6 @@ const HoverComparisonSection = () => {
           </button>
         </div>
       </div>
-
-      {/* Modal-Implementierung */}
       <Modal
         isOpen={modalOpen}
         onClose={handleCloseModal}
@@ -128,6 +189,8 @@ const HoverComparisonSection = () => {
       </Modal>
     </section>
   );
-};
+});
+
+HoverComparisonSection.displayName = "HoverComparisonSection";
 
 export default HoverComparisonSection;

@@ -15,15 +15,23 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.4",
+    "@react-three/fiber": "^9.3.0",
     "axios": "^1.11.0",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.539.0",
+    "maath": "^0.10.8",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.62.0",
     "react-router-dom": "^7.8.2",
-    "swiper": "^11.2.10"
+    "swiper": "^11.2.10",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "three": "^0.180.0",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",

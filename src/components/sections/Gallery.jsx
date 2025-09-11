@@ -1,8 +1,8 @@
 // src/components/sections/Gallery.jsx
 
-import { useState } from "react";
+import { useState, memo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, X } from "lucide-react";
+import { Sparkles, X, Shield } from "lucide-react";
 import { useGallery } from "../../hooks/useGallery";
 import { galleryImages } from "../../data/content";
 import { cn } from "../../utils/cn";
@@ -10,7 +10,7 @@ import { cn } from "../../utils/cn";
 // ====================================================================================
 // Erweiterte Kartenansicht mit optimierten Animationen
 // ====================================================================================
-function ExpandedCard({ image, close }) {
+const ExpandedCard = memo(({ image, close }) => {
   const handleScroll = (e) => e.stopPropagation();
   const transition = { type: "spring", stiffness: 250, damping: 30 };
 
@@ -112,27 +112,46 @@ function ExpandedCard({ image, close }) {
       </div>
     </div>
   );
-}
+});
+
+ExpandedCard.displayName = "ExpandedCard";
 
 // ====================================================================================
-// Vorschau-Karte
+// Vorschau-Karte mit einfacher Bildskalierung
 // ====================================================================================
-function Card({ image, onSelect, className }) {
+const Card = memo(({ image, onSelect, className }) => {
+  const [isLargeSquare, setIsLargeSquare] = useState(false);
+  const [isWideContainer, setIsWideContainer] = useState(false);
+
+  useEffect(() => {
+    setIsLargeSquare(className?.includes("row-span-2"));
+    setIsWideContainer(
+      className?.includes("col-span-2") && !className?.includes("row-span-2")
+    );
+  }, [className]);
+
   return (
     <motion.div
       layoutId={`card-container-${image.id}`}
       onClick={() => onSelect(image.id)}
       className={cn(
-        "group relative cursor-pointer bg-white overflow-hidden rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300",
+        "group relative cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300",
         className
       )}
     >
-      <motion.img
-        layoutId={`card-image-${image.id}`}
-        src={image.src}
-        alt={image.alt}
-        className="w-full h-full object-cover"
-      />
+      <div className="absolute inset-0 rounded-2xl overflow-hidden">
+        <motion.img
+          layoutId={`card-image-${image.id}`}
+          src={image.src}
+          alt={image.alt}
+          className="w-full h-full"
+          style={{
+            objectFit: "cover",
+          }}
+          whileHover={{ scale: 1.05 }}
+          transition={{ duration: 0.3 }}
+        />
+      </div>
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
         <motion.h3
           layoutId={`card-title-${image.id}`}
@@ -149,12 +168,14 @@ function Card({ image, onSelect, className }) {
       </div>
     </motion.div>
   );
-}
+});
+
+Card.displayName = "Card";
 
 // ====================================================================================
 // Haupt-Galerie-Komponente
 // ====================================================================================
-const Gallery = () => {
+const Gallery = memo(() => {
   const { activeFilter, setActiveFilter, filteredImages, categories } =
     useGallery(galleryImages);
 
@@ -179,7 +200,29 @@ const Gallery = () => {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Entdecken Sie eine Auswahl unserer schönsten Bildbearbeitungen.
           </p>
+          {/* === Datenschutzhinweis === */}
+          <div className="max-w-3xl mx-auto mt-8 bg-white border border-purple-100 rounded-xl shadow-sm p-4 text-left">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <Shield className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <h4 className="text-base font-semibold text-gray-800">
+                  Unser Versprechen: Ihre Privatsphäre
+                </h4>
+                <p className="text-sm text-gray-600 mt-1 leading-relaxed">
+                  Um die Privatsphäre unserer Kunden zu schützen, werden alle
+                  hier gezeigten Portfolio-Bilder nur mit ausdrücklicher
+                  Zustimmung der Eltern und stets in anonymisierter Form (durch
+                  Verdeckung der Gesichter) dargestellt. Ihre Erinnerungen sind
+                  bei uns sicher.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Filter-Buttons  */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
           {categories.map((category) => (
             <button
@@ -197,17 +240,23 @@ const Gallery = () => {
           ))}
         </div>
 
-        {/* Asymmetrisches Grid Layout */}
+        {/* Lückenfreies Grid Layout für 12 Bilder */}
         <motion.div
           layout
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[250px]"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[250px] w-full"
         >
           {filteredImages.map((image, index) => {
             let className = "";
-            if ((index + 1) % 5 === 0) {
-              className = "col-span-2 row-span-2";
-            } else if ((index + 1) % 7 === 0) {
-              className = "col-span-2";
+            
+            // Perfektes Layout ohne Gaps - manuelle Positionierung
+            if (index === 0 || index === 5) {
+              className = "row-span-2"; // Hohe Bilder
+            } else if (index === 2 || index === 7) {
+              className = "col-span-2"; // Breite Bilder
+            } else if (index === 10) {
+              className = "col-span-2 row-span-2"; // Großes Quadrat
+            } else if (image.title === "Märchen Portrait") {
+              className = "col-span-2"; // Märchen Portrait breit machen
             }
             return (
               <Card
@@ -232,6 +281,8 @@ const Gallery = () => {
       </AnimatePresence>
     </section>
   );
-};
+});
+
+Gallery.displayName = "Gallery";
 
 export default Gallery;

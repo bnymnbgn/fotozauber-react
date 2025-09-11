@@ -1,20 +1,154 @@
+/* KORRIGIERTE index.css DATEI */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Keyframes Definition */
+@keyframes aurora {
+  0% {
+    background-position: 0% 50%;
+    transform: rotate(-5deg) scale(0.9);
+  }
+  25% {
+    background-position: 50% 100%;
+    transform: rotate(5deg) scale(1.1);
+  }
+  50% {
+    background-position: 100% 50%;
+    transform: rotate(-3deg) scale(0.95);
+  }
+  75% {
+    background-position: 50% 0%;
+    transform: rotate(3deg) scale(1.05);
+  }
+  100% {
+    background-position: 0% 50%;
+    transform: rotate(-5deg) scale(0.9);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  53%,
+  80%,
+  100% {
+    transform: translateX(-50%) translateY(0) translateZ(0);
+  }
+  40%,
+  43% {
+    transform: translateX(-50%) translateY(-10px) translateZ(0);
+  }
+  70% {
+    transform: translateX(-50%) translateY(-5px) translateZ(0);
+  }
+  90% {
+    transform: translateX(-50%) translateY(-2px) translateZ(0);
+  }
+}
+
+@keyframes endless-cycle {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(0) translateZ(0);
+  }
+  2% {
+    opacity: 1;
+    transform: scale(1) translateY(0) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(-75vh) translateZ(0);
+  }
+}
+
+@keyframes fast-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @layer base {
   * {
     box-sizing: border-box;
+    @apply border-border;
   }
 
   body {
     font-family: "Inter", system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
+    @apply bg-background text-foreground;
   }
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+    background-color: white;
+    min-height: 100%;
+  }
+
+  .theme {
+    --animate-aurora: aurora 8s ease-in-out infinite alternate;
+  }
+
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.1%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -40,41 +174,112 @@
   }
 
   .aurora-logo-container {
-    /* 1. Definieren Sie die Größe des Logo-Containers */
-    width: 300px; /* Passen Sie Breite an Ihr Logo an */
-    height: 150px; /* Passen Sie Höhe an Ihr Logo an */
-
-    /* 2. Wenden Sie das Logo als Maske an */
-    /* Stellen Sie sicher, dass der Pfad zu Ihrem Logo korrekt ist */
+    width: 300px;
+    height: 150px;
     mask-image: url("assets/logo.svg");
-    mask-size: contain; /* Stellt sicher, dass das gesamte Logo in den Container passt */
+    mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: center;
-
-    /* Webkit-Präfix für maximale Kompatibilität (Safari) */
+    margin-bottom: -6rem;
     -webkit-mask-image: url("assets/logo.svg");
     -webkit-mask-size: contain;
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-position: center;
   }
 
-  /* Neue Checkbox-Styles */
   .custom-checkbox {
     @apply w-5 h-5 rounded appearance-none border border-gray-300 bg-white checked:bg-gradient-to-r checked:from-primary-600 checked:to-secondary-600 checked:border-transparent focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-300 cursor-pointer;
-    transform: translateZ(0); /* GPU-Beschleunigung */
+    transform: translateZ(0);
   }
 
-  /* Pseudo-Element für Häkchen-Symbol */
   .custom-checkbox:checked::after {
-    content: "\2713"; /* Unicode für Häkchen */
+    content: "\2713";
     @apply text-white text-center text-sm leading-5 block;
   }
 
-  /* Barrierefreiheit: Reduzierte Animationen */
-  @media (prefers-reduced-motion: reduce) {
-    .custom-checkbox {
-      transition-duration: 0.01ms !important;
-    }
+  /* Swiper Pagination Styles - KORRIGIERT */
+  .swiper-pagination {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: auto !important;
+    bottom: 20px !important; /* Mehr Abstand zum unteren Rand */
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 8px 16px !important;
+    border-radius: 999px !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    z-index: 10 !important;
+  }
+
+  .swiper-pagination-bullet {
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    background-color: #d1d5db !important; /* Hellgrau für inaktive Bullets */
+    opacity: 0.6 !important;
+    transition: all 0.3s ease !important;
+    margin: 0 6px !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    border: none !important;
+    outline: none !important;
+  }
+
+  .swiper-pagination-bullet:hover {
+    opacity: 0.8 !important;
+    transform: scale(1.1) !important;
+  }
+
+  .swiper-pagination-bullet-active {
+    opacity: 1 !important;
+    transform: scale(1.3) !important;
+    background: linear-gradient(
+      135deg,
+      #a855f7,
+      #ec4899
+    ) !important; /* Lila zu Pink */
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.5) !important;
+  }
+
+  /* Spezifische Regeln für den About-Bereich */
+  #about .swiper-pagination {
+    bottom: -10px !important; /* Positionierung außerhalb der Karte */
+  }
+
+  #about .swiper-pagination-bullet {
+    background-color: #9ca3af !important;
+  }
+
+  #about .swiper-pagination-bullet-active {
+    background: linear-gradient(135deg, #8b5cf6, #ec4899) !important;
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6) !important;
+  }
+
+  /* POSITIONIERUNG FÜR DEN TESTIMONIAL-SLIDER */
+  .testimonials-parallax-slider {
+    padding: 0 40px;
+  }
+  .testimonials-parallax-slider .swiper-slide {
+    width: 320px;
+    height: 360px;
+  }
+  .testimonials-parallax-slider .swiper-button-next,
+  .testimonials-parallax-slider .swiper-button-prev {
+    color: #ffffff !important;
+    --swiper-navigation-size: 30px;
+  }
+
+  /* ENDGÜLTIGE KORREKTUR GEGEN ABSCHNEIDEN: Verwendet einen spezifischeren Selektor, um die Regel aus index.css zu überschreiben */
+  #about .testimonials-parallax-slider .swiper-pagination {
+    bottom: 30px !important; /* Positioniert die Pagination sicher INNERHALB des Containers */
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
   }
 }
 
@@ -96,7 +301,6 @@
     -webkit-line-clamp: 2;
   }
 
-  /* Force disable any transform effects on hero text */
   #home .hero-text-static {
     transform: none !important;
     perspective: none !important;
@@ -112,7 +316,6 @@
     will-change: auto !important;
   }
 
-  /* 3D perspective effects ONLY for image container */
   .image-stack {
     perspective: 1000px !important;
     transform-style: preserve-3d !important;
@@ -128,10 +331,6 @@
 
   .image-container:hover {
     will-change: transform !important;
-  }
-
-  /* Original Hover-Effekt: Vereinfachter Scale mit GPU-Beschleunigung */
-  .image-container:hover {
     transform: scale(1.08) translateZ(0) !important;
     z-index: 10 !important;
     border: 4px solid transparent !important;
@@ -139,7 +338,6 @@
       linear-gradient(135deg, #fb7185, #a78bfa, #6366f1) border-box !important;
   }
 
-  /* Image scaling im Container */
   .image-container .hero-image {
     transition: transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
   }
@@ -148,7 +346,6 @@
     transform: scale(1.12) translateZ(0);
   }
 
-  /* Hero Section Styles */
   .hero-background {
     background: linear-gradient(
       135deg,
@@ -158,86 +355,33 @@
     ) !important;
   }
 
-  /* Scroll Indicator Animation */
   .scroll-indicator {
     animation: bounce 2s infinite !important;
-  }
-
-  @keyframes bounce {
-    0%,
-    20%,
-    53%,
-    80%,
-    100% {
-      transform: translateX(-50%) translateY(0) translateZ(0);
-    }
-    40%,
-    43% {
-      transform: translateX(-50%) translateY(-10px) translateZ(0);
-    }
-    70% {
-      transform: translateX(-50%) translateY(-5px) translateZ(0);
-    }
-    90% {
-      transform: translateX(-50%) translateY(-2px) translateZ(0);
-    }
-  }
-}
-
-@layer utilities {
-  /* ==============================================
-    OPTIMIERUNGEN FÜR FLIESSENDE KARTEN-ANIMATION
-    ==============================================
-  */
-
-  @keyframes endless-cycle {
-    0% {
-      opacity: 0;
-      transform: scale(0.5) translateY(0) translateZ(0);
-    }
-    2% {
-      opacity: 1;
-      transform: scale(1) translateY(0) translateZ(0);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1) translateY(-75vh) translateZ(0);
-    }
   }
 
   .flowing-card {
     opacity: 0;
     will-change: transform, opacity;
     transform: translateZ(0);
+    animation: endless-cycle 20s linear infinite; /* Animation anwenden */
   }
 
-  /* --- Responsive Anpassungen --- */
-  @media (max-width: 768px) {
-    .flowing-card {
-      transform: scale(0.8);
-    }
-  }
-
-  /* --- Barrierefreiheit: Animationen für Nutzer reduzieren, die dies wünschen --- */
   @media (prefers-reduced-motion: reduce) {
+    .custom-checkbox,
     .flowing-card {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
-
+    .flowing-card {
+      animation: none !important;
+    }
     .particle {
       animation: none !important;
     }
   }
-}
 
-/* NEU: Separate Keyframes für schnelles Einblenden */
-@keyframes fast-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+  @media (max-width: 768px) {
+    .flowing-card {
+      transform: scale(0.8);
+    }
   }
 }

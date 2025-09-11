@@ -74,7 +74,7 @@ export const services = [
 export const galleryImages = [
   {
     id: 1,
-    src: "/assets/img/randombebe after.jpg",
+    src: "/assets/img/randombebe after.webp",
     alt: "Weltraum Abenteuer",
     category: "space",
     title: "Kleine Astronautin",
@@ -87,7 +87,7 @@ export const galleryImages = [
   },
   {
     id: 2,
-    src: "/assets/img/TIGER after.jpg",
+    src: "/assets/img/TIGER after.webp",
     alt: "Dschungel Expedition - Vorher",
     category: "animals",
     title: "Dschungel Abenteuer",
@@ -96,7 +96,7 @@ export const galleryImages = [
   },
   {
     id: 3,
-    src: "/assets/img/ele after.jpg",
+    src: "/assets/img/ele after.webp",
     alt: "Dschungel Expedition - Nachher",
     category: "animals",
     title: "Wilde Freundschaften",
@@ -105,7 +105,7 @@ export const galleryImages = [
   },
   {
     id: 4,
-    src: "/assets/img/bebe after.jpg",
+    src: "/assets/img/bebe after.webp",
     alt: "Unterwasser Märchen",
     category: "underwater",
     title: "Kleine Meerjungfrau",
@@ -114,7 +114,7 @@ export const galleryImages = [
   },
   {
     id: 5,
-    src: "/assets/img/Halid 1.jpg",
+    src: "/assets/img/Halid after.webp",
     alt: "Fantasy Prinzessin",
     category: "fantasy",
     title: "Märchen Prinzessin",
@@ -127,7 +127,7 @@ export const galleryImages = [
   },
   {
     id: 6,
-    src: "/assets/img/after.jpg",
+    src: "/assets/img/after.webp",
     alt: "Weltraum Entdecker",
     category: "space",
     title: "Galaktischer Entdecker",
@@ -136,7 +136,7 @@ export const galleryImages = [
   },
   {
     id: 7,
-    src: "/assets/img/after1.jpg",
+    src: "/assets/img/after1.webp",
     alt: "Magischer Garten",
     category: "fantasy",
     title: "Verzauberter Garten",
@@ -145,7 +145,7 @@ export const galleryImages = [
   },
   {
     id: 8,
-    src: "/assets/img/after5.jpg",
+    src: "/assets/img/after5.webp",
     alt: "Überraschungs Transformation",
     category: "surprise",
     title: "Magische Überraschung",
@@ -154,12 +154,12 @@ export const galleryImages = [
   },
   {
     id: 9,
-    src: "/assets/transforms/6.png",
-    alt: "Unterwasser Abenteuer",
-    category: "underwater",
-    title: "Ozean Abenteuer",
-    description: "Schwimmen mit Delfinen und tropischen Fischen",
-    transformation: "Marine Life",
+    src: "/assets/img/after2.webp",
+    alt: "Teddy Chilling",
+    category: "animals",
+    title: "Teddy Chilling",
+    description: "Chillen mit Teddies und Pinguinen",
+    transformation: "Chillen mit Teddys",
   },
   {
     id: 10,
@@ -172,7 +172,7 @@ export const galleryImages = [
   },
   {
     id: 11,
-    src: "/assets/img/randombebe.jpg",
+    src: "/assets/img/randombebe after.webp",
     alt: "Süße Überraschung",
     category: "surprise",
     title: "Kleine Entdeckerin",
@@ -181,7 +181,7 @@ export const galleryImages = [
   },
   {
     id: 12,
-    src: "/assets/img/klem 1.jpg",
+    src: "/assets/img/klem after.webp",
     alt: "Fantasie Portrait",
     category: "fantasy",
     title: "Märchen Portrait",
@@ -193,44 +193,44 @@ export const galleryImages = [
 export const comparisons = [
   {
     id: 1,
-    before: "/assets/img/Halid before.jpg",
-    after: "/assets/img/Halid after.jpg",
+    before: "/assets/img/Halid before.webp",
+    after: "/assets/img/Halid after.webp",
     title: "Landschaftsfotografie",
     description:
       "Transformation einer Standardaufnahme in ein episches Landschaftsbild.", // Optional Beschreibung hinzufügen
   },
   {
     id: 2,
-    before: "/assets/img/bebe before.jpg",
-    after: "/assets/img/bebe after.jpg",
+    before: "/assets/img/bebe before.webp",
+    after: "/assets/img/bebe after.webp",
     title: "Porträtfotografie",
     description: "Kreative Bearbeitung eines Kinderporträts.", // Optional Beschreibung hinzufügen
   },
   {
     id: 3,
-    before: "/assets/img/randombebe before.jpg",
-    after: "/assets/img/randombebe after.jpg",
+    before: "/assets/img/randombebe before.webp",
+    after: "/assets/img/randombebe after.webp",
     title: "Architekturfotografie",
     description: "Details und Stimmung in der Architektur hervorheben.", // Optional Beschreibung hinzufügen
   },
   {
     id: 4,
-    before: "/assets/img/TIGER before.jpg",
-    after: "/assets/img/TIGER after.jpg",
+    before: "/assets/img/TIGER before.webp",
+    after: "/assets/img/TIGER after.webp",
     title: "Naturfotografie",
     description: "Farbkorrektur und Schärfung bei Tieraufnahmen.", // Optional Beschreibung hinzufügen
   },
   {
     id: 5,
-    before: "/assets/img/before1.jpg",
-    after: "/assets/img/after1.jpg",
+    before: "/assets/img/before1.webp",
+    after: "/assets/img/after1.webp",
     title: "Straßenfotografie",
     description: "Dynamik und Lichtstimmung verbessern.", // Optional Beschreibung hinzufügen
   },
   {
     id: 6,
-    before: "/assets/img/before.jpg",
-    after: "/assets/img/after.jpg",
+    before: "/assets/img/before.webp",
+    after: "/assets/img/after.webp",
     title: "Farbkorrektur",
     description: "Von blassen Farben zu lebendigen Ergebnissen.", // Optional Beschreibung hinzufügen
   },
@@ -239,21 +239,24 @@ export const comparisons = [
 export const pricingPlans = [
   {
     id: "basic",
-    name: "Basic Retusche",
-    price: 25,
+    name: "Giraffe",
+    price: 29,
     originalPrice: 35,
     duration: "2-3 Tage",
     popular: false,
     description: "Perfekt für einfache Verschönerungen und Korrekturen",
     features: [
-      "Hautretusche & Augenaufhellung",
+      "Compositing & einfache Effekte",
       "Farbkorrektur & Belichtung",
       "Hintergrund-Optimierung",
-      "1 Korrekturschleife",
       "Hochauflösende Datei (300 DPI)",
       "JPEG & PNG Format",
     ],
-    limitations: ["Keine Hintergrundersetzung", "Keine komplexen Composings"],
+    limitations: [
+      "Keine Hintergrundersetzung",
+      "Keine komplexen Composings",
+      "Keine Korrekturschleifen",
+    ],
     icon: "palette",
     color: "from-blue-500 to-blue-600",
     bgColor: "bg-blue-50",
@@ -261,14 +264,14 @@ export const pricingPlans = [
   },
   {
     id: "creative",
-    name: "Creative Magic",
+    name: "Zebra",
     price: 59,
     originalPrice: 79,
     duration: "4-6 Tage",
     popular: true,
     description: "Unsere beliebteste Wahl für magische Transformationen",
     features: [
-      "Alles aus Basic Retusche",
+      "Alles aus Giraffe",
       "Kreative Hintergrundersetzung",
       "Themen-Compositing (Weltraum, Märchen, etc.)",
       "Objekt-Integration & Effekte",
@@ -285,20 +288,18 @@ export const pricingPlans = [
   },
   {
     id: "premium",
-    name: "Premium Studio",
+    name: "Löwe",
     price: 99,
     originalPrice: 129,
     duration: "5-8 Tage",
     popular: false,
     description: "Höchste Qualität für anspruchsvolle Kunstwerke",
     features: [
-      "Alles aus Creative Magic",
+      "Alles aus Zebra",
       "KI-unterstützte Verbesserungen",
       "Komplexe Multi-Layer Composings",
       "Individuelle Effekt-Erstellung",
       "Unlimited Korrekturen",
-      "Persönlicher Bildbearbeiter",
-      "Video-Zeitraffer der Bearbeitung",
       "Druckfertige Ausgabe (A3-A1)",
       "Kommerzielle Lizenz",
     ],
@@ -310,21 +311,20 @@ export const pricingPlans = [
   },
   {
     id: "family",
-    name: "Family Pack",
+    name: "Elefant",
     price: 149,
-    originalPrice: 200,
+    originalPrice: 229,
     duration: "7-10 Tage",
     popular: false,
     description: "Perfekt für Geschwister und Familienfotos",
     features: [
-      "3-5 Bilder im Creative Magic Stil",
-      "Einheitliches Thema & Stil",
+      "3-5 Bilder im Zebra Stil",
+      "Unterschiedliche Themen & Stile",
       "Familienrabatt (25% Ersparnis)",
       "Alle Einzelbild-Features",
       "Gruppen-Compositing möglich",
       "Family Album Layout",
       "Unlimited Korrekturen",
-      "Geschenk-Verpackung",
     ],
     limitations: [],
     icon: "users",

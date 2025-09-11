@@ -134,10 +134,6 @@ class EnhancedSpatialGrid {
         }
       }
 
-      // 3. Notfall-Fallback fÃ¼r Desktop (kann bei hoher Dichte zu Ãœberlappungen fÃ¼hren)
-      console.warn(
-        `[EnhancedSpatialGrid] Could not find safe position in lane ${lane.id} (Desktop). Density issue.`
-      );
       return Math.random() * availableHeight;
     }
   }
@@ -217,6 +213,7 @@ class EnhancedSpatialGrid {
 
 const useSpatialCardAnimation = (transformationExamples) => {
   const [flowingCards, setFlowingCards] = useState([]);
+  const [isAnimating, setIsAnimating] = useState(true);
   const spatialGridRef = useRef(null);
   const timeoutsRef = useRef(new Set());
   const mountedRef = useRef(true);
@@ -268,13 +265,6 @@ const useSpatialCardAnimation = (transformationExamples) => {
     const transformationDelayMs = beforeImageFlowDurationSeconds * 1000;
 
     // SicherheitsprÃ¼fung: Stellen Sie sicher, dass die Transformation nicht nach dem Ende des Zyklus stattfindet.
-    if (beforeImageFlowDurationSeconds >= flowDurationSeconds) {
-      console.warn(
-        "Transformation timing issue: Phase 1 duration exceeds total flow duration."
-      );
-      // Ggf. transformationDelayMs auf einen Maximalwert kappen, z.B.:
-      // transformationDelayMs = flowDurationSeconds * 0.9 * 1000;
-    }
 
     return {
       transformationDelay: transformationDelayMs, // Gesteuert durch Parameter 2
@@ -398,7 +388,7 @@ const useSpatialCardAnimation = (transformationExamples) => {
     mountedRef.current = true;
 
     const initialize = () => {
-      if (!mountedRef.current) return;
+      if (!mountedRef.current || !isAnimating) return;
       clearAllTimeouts();
 
       // NEU: Reset der verwendeten Indices bei Initialisierung
@@ -414,7 +404,7 @@ const useSpatialCardAnimation = (transformationExamples) => {
 
       const numCardsToShow = grid.isMobile
         ? Math.min(mobileCardCount, transformationExamples.length) // Nimm maximal 2 Karten, aber nicht mehr als vorhanden
-        : transformationExamples.length;
+        : Math.min(6, transformationExamples.length); // Begrenze Desktop auf 6 Karten
 
       // NEU: Erstelle Karten mit zufälligen Indices statt sequenzieller
       const initialCards = [];
@@ -431,7 +421,9 @@ const useSpatialCardAnimation = (transformationExamples) => {
       initialCards.forEach(scheduleNextReplacement);
     };
 
-    initialize();
+    if (isAnimating) {
+      initialize();
+    }
 
     const handleResize = () => initialize();
     window.addEventListener("resize", handleResize);
@@ -447,9 +439,67 @@ const useSpatialCardAnimation = (transformationExamples) => {
     scheduleNextReplacement,
     transformationExamples,
     getNewRandomIndex,
+    isAnimating,
   ]);
 
-  return { flowingCards };
+  // Start/Stop animation when isAnimating changes
+  useEffect(() => {
+    if (isAnimating) {
+      const initialize = () => {
+        if (!mountedRef.current) return;
+        clearAllTimeouts();
+
+        usedIndicesRef.current.clear();
+
+        spatialGridRef.current = new EnhancedSpatialGrid(
+          window.innerWidth,
+          window.innerHeight
+        );
+
+        const grid = spatialGridRef.current;
+        const mobileCardCount = 2;
+
+        const numCardsToShow = grid.isMobile
+          ? Math.min(mobileCardCount, transformationExamples.length)
+          : Math.min(6, transformationExamples.length);
+
+        const initialCards = [];
+        for (let i = 0; i < numCardsToShow; i++) {
+          const randomIndex = getNewRandomIndex();
+          const initialDelay = Math.random() * 5000;
+          const card = createNewCard(randomIndex, grid, initialDelay);
+          if (card) {
+            initialCards.push(card);
+          }
+        }
+
+        setFlowingCards(initialCards);
+        initialCards.forEach(scheduleNextReplacement);
+      };
+
+      initialize();
+    } else {
+      clearAllTimeouts();
+      spatialGridRef.current?.clear();
+      setFlowingCards([]);
+    }
+  }, [
+    isAnimating,
+    transformationExamples,
+    createNewCard,
+    getNewRandomIndex,
+    scheduleNextReplacement,
+  ]);
+
+  const startAnimation = () => {
+    setIsAnimating(true);
+  };
+
+  const stopAnimation = () => {
+    setIsAnimating(false);
+  };
+
+  return { flowingCards, startAnimation, stopAnimation };
 };
 
 export default useSpatialCardAnimation;
