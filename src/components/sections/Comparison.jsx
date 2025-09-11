@@ -1,386 +1,196 @@
-// src/components/sections/Comparison.jsx
-
-import { useState, useRef, useEffect } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, EffectFade } from "swiper/modules";
-import { ArrowLeft, ArrowRight, Eye, Sparkles, Timer, X } from "lucide-react";
+import { useState, useEffect, memo } from "react";
+import { Timer, Sparkles, Eye, X } from "lucide-react";
+import Modal from "../ui/Modal";
 import { comparisons } from "../../data/content";
+import HoverComparisonSlider from "../ui/HoverComparisonSlider";
+import CustomSwiper from "../ui/CustomSwiper";
 
-// Swiper styles
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/effect-fade";
+const statsData = [
+  {
+    id: 1,
+    icon: Sparkles,
+    gradient: "from-purple-500 to-pink-500",
+    value: "500+",
+    title: "Transformierte Bilder",
+    description: "Professionelle Bearbeitung für beeindruckende Ergebnisse.",
+  },
+  {
+    id: 2,
+    icon: Timer,
+    gradient: "from-blue-500 to-purple-500",
+    value: "24h",
+    title: "Express-Service verfügbar",
+    description: "Schnelle Ergebnisse, wann immer Sie sie brauchen.",
+  },
+  {
+    id: 3,
+    icon: Eye,
+    gradient: "from-green-500 to-blue-500",
+    value: "100%",
+    title: "Kundenzufriedenheit",
+    description: "Unsere Kunden lieben die Qualität unserer Arbeit.",
+  },
+];
 
-// Reusable Lightbox Slider
-const LightboxComparisonSlider = ({ beforeImage, afterImage }) => {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef(null);
-
-  const updatePosition = (clientX) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const position = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setSliderPosition(position);
-  };
-
-  const handleInteractionStart = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleInteractionMove = (e) => {
-    if (!isDragging) return;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    updatePosition(clientX);
-  };
-
-  const handleInteractionEnd = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleInteractionMove);
-      document.addEventListener("mouseup", handleInteractionEnd);
-      document.addEventListener("touchmove", handleInteractionMove, {
-        passive: false,
-      });
-      document.addEventListener("touchend", handleInteractionEnd);
-    }
-    return () => {
-      document.removeEventListener("mousemove", handleInteractionMove);
-      document.removeEventListener("mouseup", handleInteractionEnd);
-      document.removeEventListener("touchmove", handleInteractionMove);
-      document.removeEventListener("touchend", handleInteractionEnd);
-    };
-  }, [isDragging]);
-
+// Die StatCard für den Desktop-Grid (bleibt unverändert)
+const StatCard = ({ stat }) => {
+  const IconComponent = stat.icon;
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-full select-none overflow-hidden rounded-lg"
-    >
-      {/* After Image (Base Layer) */}
-      <img
-        src={afterImage}
-        alt="Nachher"
-        className="absolute inset-0 w-full h-full object-cover"
-        draggable={false}
-      />
-      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium pointer-events-none">
-        Nachher
-      </div>
-
-      {/* Before Image (Clipped Top Layer) */}
+    <div className="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 border border-gray-100 h-full">
       <div
-        className="absolute inset-0 overflow-hidden"
-        style={{
-          clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)`,
-        }}
+        className={`w-16 h-16 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
       >
-        <img
-          src={beforeImage}
-          alt="Vorher"
-          className="w-full h-full object-cover"
-          draggable={false}
-        />
-        <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium pointer-events-none">
-          Vorher
-        </div>
+        <IconComponent className="w-8 h-8 text-white" />
       </div>
-
-      <div
-        className="absolute top-0 bottom-0 w-1 bg-white shadow-lg z-20 cursor-ew-resize"
-        style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
-        onMouseDown={handleInteractionStart}
-        onTouchStart={handleInteractionStart}
-      >
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full shadow-xl flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-110 transition-all duration-200 border-4 border-purple-500">
-          <div className="w-6 h-6 flex items-center justify-center space-x-1">
-            <div className="w-1 h-6 bg-purple-500 rounded-full"></div>
-            <div className="w-1 h-6 bg-purple-500 rounded-full"></div>
-          </div>
-        </div>
-      </div>
+      <h3 className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</h3>
+      <p className="text-gray-600 font-medium">{stat.title}</p>
+      <p className="text-gray-500 text-sm mt-1">{stat.description}</p>
     </div>
   );
 };
 
-const ComparisonSlider = ({
-  beforeImage,
-  afterImage,
-  title,
-  description,
-  onClick,
-}) => {
-  const [sliderPosition, setSliderPosition] = useState(50);
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef(null);
-
-  const updatePosition = (clientX) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const position = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setSliderPosition(position);
-  };
-
-  const handleInteractionStart = (e) => {
-    e.stopPropagation(); // Prevent card click when interacting with handle
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleInteractionMove = (e) => {
-    if (!isDragging) return;
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    updatePosition(clientX);
-  };
-
-  const handleInteractionEnd = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleInteractionMove);
-      document.addEventListener("mouseup", handleInteractionEnd);
-      document.addEventListener("touchmove", handleInteractionMove, {
-        passive: false,
-      });
-      document.addEventListener("touchend", handleInteractionEnd);
-    }
-    return () => {
-      document.removeEventListener("mousemove", handleInteractionMove);
-      document.removeEventListener("mouseup", handleInteractionEnd);
-      document.removeEventListener("touchmove", handleInteractionMove);
-      document.removeEventListener("touchend", handleInteractionEnd);
-    };
-  }, [isDragging]);
-
+// NEU: Eine Funktion, die nur den *Inhalt* für die mobile Slider-Karte rendert
+const renderStatCardContent = (stat) => {
+  const IconComponent = stat.icon;
   return (
-    <div className="comparison-item bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500">
+    <div className="text-center p-6">
       <div
-        ref={containerRef}
-        className="relative aspect-[4/3] overflow-hidden select-none cursor-pointer"
-        onClick={onClick}
+        className={`w-16 h-16 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
       >
-        {/* After Image (Base Layer) */}
-        <div className="absolute inset-0">
-          <img
-            src={afterImage}
-            alt="Nachher"
-            className="w-full h-full object-cover"
-            draggable={false}
-          />
-          <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-            Nachher
-          </div>
-        </div>
-
-        {/* Before Image (Clipped Top Layer) */}
-        <div
-          className="absolute inset-0 overflow-hidden"
-          style={{
-            clipPath: `polygon(0 0, ${sliderPosition}% 0, ${sliderPosition}% 100%, 0 100%)`,
-          }}
-        >
-          <img
-            src={beforeImage}
-            alt="Vorher"
-            className="w-full h-full object-cover"
-            draggable={false}
-          />
-          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-            Vorher
-          </div>
-        </div>
-
-        <div
-          className="absolute top-0 bottom-0 w-1 bg-white shadow-lg z-20 cursor-ew-resize"
-          style={{ left: `${sliderPosition}%`, transform: "translateX(-50%)" }}
-          onMouseDown={handleInteractionStart}
-          onTouchStart={handleInteractionStart}
-        >
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full shadow-xl flex items-center justify-center cursor-grab active:cursor-grabbing hover:scale-110 transition-all duration-200 border-4 border-purple-500">
-            <div className="w-6 h-6 flex items-center justify-center space-x-1">
-              <div className="w-1 h-6 bg-purple-500 rounded-full"></div>
-              <div className="w-1 h-6 bg-purple-500 rounded-full"></div>
-            </div>
-          </div>
-        </div>
+        <IconComponent className="w-8 h-8 text-white" />
       </div>
-
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
-        <p className="text-gray-600">{description}</p>
-      </div>
+      <h3 className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</h3>
+      <p className="text-gray-600 font-medium">{stat.title}</p>
+      <p className="text-gray-500 text-sm mt-1">{stat.description}</p>
     </div>
   );
 };
 
-const Comparison = () => {
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-  const [lightboxContent, setLightboxContent] = useState({
-    before: "",
-    after: "",
-  });
+const HoverComparisonSection = memo(() => {
+  // ... (Hooks und Funktionen bleiben unverändert)
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedComparison, setSelectedComparison] = useState(null);
 
-  const openLightbox = (before, after) => {
-    setLightboxContent({ before, after });
-    setIsLightboxOpen(true);
+  const handleOpenModal = (comparisonData) => {
+    setSelectedComparison(comparisonData);
+    setModalOpen(true);
   };
 
-  const closeLightbox = () => {
-    setIsLightboxOpen(false);
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setTimeout(() => setSelectedComparison(null), 300);
   };
 
   return (
-    <>
-      <section
-        id="comparison"
-        className="py-20 sm:py-32 bg-gradient-to-br from-white to-gray-50 relative overflow-hidden"
-      >
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-40 left-20 w-20 h-20 bg-blue-400 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-40 right-20 w-32 h-32 bg-purple-400 rounded-full blur-3xl"></div>
+    <section className="py-20 sm:py-32 bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
+      <div className="container relative z-10 mx-auto px-4 max-w-7xl">
+        {/* ... (Header und Comparison Grid bleiben unverändert) ... */}
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full px-5 py-2 text-sm font-medium mb-6">
+            <Timer className="w-4 h-4" />
+            <span>VORHER & NACHHER VERGLEICHE</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Magische <span className="text-gradient">Transformationen</span>
+          </h2>
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Bewegen Sie Ihre Maus über die Bilder, um die dramatischen
+            Verbesserungen zu erleben. Klicken Sie, um die Details zu erkunden.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          {comparisons.map((comparison) => (
+            <HoverComparisonSlider
+              key={comparison.id}
+              beforeImage={comparison.before}
+              afterImage={comparison.after}
+              title={comparison.title}
+              onImageClick={() => handleOpenModal(comparison)}
+            />
+          ))}
         </div>
 
-        <div className="container relative z-10 mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 rounded-full px-4 py-2 text-sm font-medium mb-6">
-              <Timer className="w-4 h-4" />
-              <span>VORHER & NACHHER</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Die
-              <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Transformation
-              </span>
-            </h2>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Erleben Sie die magische Verwandlung von gewöhnlichen Fotos zu
-              außergewöhnlichen Kunstwerken. Bewegen Sie den Schieberegler oder
-              klicken Sie, um die Unterschiede zu erkunden.
+        {/* Stats Section */}
+        <div className="md:hidden">
+          <CustomSwiper
+            items={statsData}
+            // Wir übergeben die Container-Styles an die Slide
+            slideClassName="flex items-center justify-center rounded-2xl bg-white shadow-xl"
+            // und rendern nur noch den Inhalt
+            renderSlide={renderStatCardContent}
+            effect="cards"
+            className="w-full h-[380px]"
+            swiperProps={{
+              style: {
+                paddingBottom: "50px",
+              },
+            }}
+          />
+        </div>
+
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-8">
+          {statsData.map((stat) => (
+            <StatCard key={stat.id} stat={stat} />
+          ))}
+        </div>
+
+        {/* ... (CTA und Modal bleiben unverändert) ... */}
+        <div className="text-center mt-16">
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            Starten Sie Ihre Transformation
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-xl mx-auto">
+            Laden Sie Ihr Bild hoch und erleben Sie die Magie unserer
+            Bearbeitung
+          </p>
+          <button className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+            <span>Jetzt kostenlos testen</span>
+            <svg
+              className="ml-2 w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <Modal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        className="relative max-w-[90vw] p-0 bg-transparent shadow-none"
+        showCloseButton={false}
+      >
+        {selectedComparison && (
+          <div className="w-full max-h-[90vh] mx-auto p-4 relative overflow-hidden">
+            <button
+              onClick={handleCloseModal}
+              className="absolute top-4 right-4 z-10 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <HoverComparisonSlider
+              beforeImage={selectedComparison.before}
+              afterImage={selectedComparison.after}
+              title={selectedComparison.title}
+              enforceAspectRatio={false}
+            />
+            <p className="mt-4 text-center text-white text-lg">
+              {selectedComparison.title}
             </p>
           </div>
-
-          <div className="hidden lg:block">
-            <div className="max-w-4xl mx-auto">
-              <ComparisonSlider
-                beforeImage={comparisons[activeSlide].before}
-                afterImage={comparisons[activeSlide].after}
-                title={comparisons[activeSlide].title}
-                description={comparisons[activeSlide].description}
-                onClick={() =>
-                  openLightbox(
-                    comparisons[activeSlide].before,
-                    comparisons[activeSlide].after
-                  )
-                }
-              />
-            </div>
-
-            <div className="flex justify-center items-center mt-8 space-x-4">
-              <button
-                onClick={() =>
-                  setActiveSlide((prev) =>
-                    prev > 0 ? prev - 1 : comparisons.length - 1
-                  )
-                }
-                className="comparison-prev w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-gray-700 hover:text-purple-600 transition-all duration-300"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div className="flex space-x-2">
-                {comparisons.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setActiveSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === activeSlide
-                        ? "bg-purple-600 w-8"
-                        : "bg-gray-300 hover:bg-gray-400"
-                    }`}
-                  />
-                ))}
-              </div>
-              <button
-                onClick={() =>
-                  setActiveSlide((prev) =>
-                    prev < comparisons.length - 1 ? prev + 1 : 0
-                  )
-                }
-                className="comparison-next w-12 h-12 bg-white rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-gray-700 hover:text-purple-600 transition-all duration-300"
-              >
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          <div className="lg:hidden grid grid-cols-1 md:grid-cols-2 gap-8">
-            {comparisons.map((comparison) => (
-              <ComparisonSlider
-                key={comparison.id}
-                beforeImage={comparison.before}
-                afterImage={comparison.after}
-                title={comparison.title}
-                description={comparison.description}
-                onClick={() =>
-                  openLightbox(comparison.before, comparison.after)
-                }
-              />
-            ))}
-          </div>
-
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">500+</h3>
-              <p className="text-gray-600">Transformierte Bilder</p>
-            </div>
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Timer className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">3-7</h3>
-              <p className="text-gray-600">Tage Bearbeitungszeit</p>
-            </div>
-            <div className="text-center p-6 bg-white rounded-2xl shadow-lg">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Eye className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">100%</h3>
-              <p className="text-gray-600">Zufriedene Kunden</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {isLightboxOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-4xl h-[80vh] p-4">
-            <button
-              onClick={closeLightbox}
-              className="absolute -top-2 -right-2 z-10 w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-800 hover:bg-gray-200 transition-all"
-            >
-              <X size={24} />
-            </button>
-            <LightboxComparisonSlider
-              beforeImage={lightboxContent.before}
-              afterImage={lightboxContent.after}
-            />
-          </div>
-        </div>
-      )}
-    </>
+        )}
+      </Modal>
+    </section>
   );
-};
+});
 
-export default Comparison;
+HoverComparisonSection.displayName = "HoverComparisonSection";
+
+export default HoverComparisonSection;

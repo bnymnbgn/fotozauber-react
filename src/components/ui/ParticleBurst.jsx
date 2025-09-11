@@ -33,6 +33,8 @@ const ParticleBurst = ({ isBursting }) => {
                   backgroundColor: color,
                   x: "-50%",
                   y: "-50%",
+                  // HINZUGEFÜGT: GPU-Beschleunigung für jedes Partikel
+                  willChange: "transform, opacity",
                 }}
                 initial={{ opacity: 1, scale: 0.5 }}
                 animate={{

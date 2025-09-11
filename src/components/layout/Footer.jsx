@@ -109,7 +109,7 @@ const Footer = () => {
               </h4>
               <div className="flex space-x-4">
                 <a
-                  href="https://instagram.com/noha.studio"
+                  href="https://instagram.com/nohastudio.de"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -117,7 +117,7 @@ const Footer = () => {
                   <Instagram className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://facebook.com/noha.studio"
+                  href="https://facebook.com/nohastudio.de"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -251,7 +251,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8 text-center">
             <div className="flex items-center space-x-2 text-gray-300">
               <Shield className="w-4 h-4 text-green-400" />
-              <span className="text-sm">100% sichere Datenübertragung</span>
+              <span className="text-sm">100% Anonym & Sicher</span>
             </div>
 
             <div className="flex items-center space-x-2 text-gray-300">
@@ -261,7 +261,7 @@ const Footer = () => {
 
             <div className="flex items-center space-x-2 text-gray-300">
               <Sparkles className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm">500+ magische Transformationen</span>
+              <span className="text-sm">100% Maßgeschneidert</span>
             </div>
           </div>
         </div>
@@ -271,7 +271,7 @@ const Footer = () => {
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={() => handleLinkClick("#contact")}
-          className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 animate-pulse"
+          className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
           aria-label="Kontakt"
         >
           <Mail className="w-6 h-6 text-white" />

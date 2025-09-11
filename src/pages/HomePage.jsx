@@ -10,6 +10,7 @@ import Process from "../components/sections/Process";
 import Pricing from "../components/sections/Pricing";
 import FAQ from "../components/sections/FAQ";
 import Contact from "../components/sections/Contact";
+import SEO from "../components/ui/SEO";
 
 const HomePage = () => {
   const location = useLocation();
@@ -29,6 +30,7 @@ const HomePage = () => {
 
   return (
     <>
+      <SEO />
       <Hero />
       <About />
       <Gallery />
