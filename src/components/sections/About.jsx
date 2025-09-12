@@ -233,6 +233,7 @@ const About = () => {
           <div className="md:hidden px-4">
             <div className="relative w-full max-w-[320px] mx-auto">
               <CustomSwiper
+                variant="cards"
                 items={achievements}
                 renderSlide={renderAchievementCard}
                 effect="cards"
@@ -283,10 +284,10 @@ const About = () => {
             </p>
           </div>
           <CustomSwiper
+            variant="testimonials"
             items={testimonials}
             renderSlide={renderTestimonialCard}
             effect="coverflow"
-            className="testimonials-parallax-slider"
             swiperProps={{
               style: {
                 paddingBottom: "80px",

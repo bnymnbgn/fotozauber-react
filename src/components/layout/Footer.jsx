@@ -14,6 +14,7 @@ import {
   Shield,
   Clock,
 } from "lucide-react";
+import FontSizeControl from "../ui/FontSizeControl";
 
 const Footer = () => {
   const navigate = useNavigate(); // 2. useNavigate hook
@@ -262,6 +263,16 @@ const Footer = () => {
             <div className="flex items-center space-x-2 text-gray-300">
               <Sparkles className="w-4 h-4 text-yellow-400" />
               <span className="text-sm">100% Maßgeschneidert</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Font Size Control */}
+        <div className="py-4 border-t border-white/10">
+          <div className="flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <span className="text-gray-300 text-sm">Schriftgröße:</span>
+              <FontSizeControl />
             </div>
           </div>
         </div>

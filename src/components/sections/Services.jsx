@@ -83,27 +83,28 @@ const ServiceCard = ({ service, index }) => {
 const renderServiceCardContent = (service) => {
   const IconComponent = iconMapping[service.icon] || Wand2;
   return (
-    <div className="p-8 h-full flex flex-col">
-      <div className="icon-container mb-6">
+    // Diese div füllt die Höhe der Slide aus und ordnet den Inhalt an.
+    <div className="p-6 flex flex-col h-full">
+      <div className="icon-container mb-4">
         <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-purple-100 to-pink-100">
           <IconComponent className="w-8 h-8 text-purple-600" />
         </div>
       </div>
-      <div className="content flex-grow flex flex-col">
-        <h3 className="text-xl font-bold text-gray-900 mb-3">{service.name}</h3>
-        <p className="text-gray-600 mb-6 leading-relaxed flex-grow">
+      <div className="content flex-grow flex flex-col text-center">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">{service.name}</h3>
+        <p className="text-gray-600 mb-4 leading-relaxed text-sm flex-grow">
           {service.description}
         </p>
-        <ul className="space-y-2 mb-6">
+        <ul className="space-y-2 mb-4 text-left">
           {service.features.map((feature, idx) => (
-            <li key={idx} className="flex items-center text-sm text-gray-700">
-              <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+            <li key={idx} className="flex items-start text-sm text-gray-700">
+              <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
               <span>{feature}</span>
             </li>
           ))}
         </ul>
         <div className="action-area mt-auto">
-          <div className="flex items-center text-purple-600 font-medium text-sm">
+          <div className="flex items-center justify-center text-purple-600 font-medium text-sm">
             <span>Mehr erfahren</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </div>
@@ -112,7 +113,6 @@ const renderServiceCardContent = (service) => {
     </div>
   );
 };
-
 const Services = () => {
   // useEffect für Pagination-Styles bleibt unverändert
 
@@ -144,10 +144,10 @@ const Services = () => {
         {/* NUR FÜR MOBILE GERÄTE: Swiper mit "cards"-Effekt */}
         <div className="md:hidden">
           <CustomSwiper
+            variant="cards"
             items={services}
-            // Wir übergeben die Container-Styles an die Slide
-            slideClassName="bg-white rounded-2xl shadow-xl"
-            // und rendern nur noch den Inhalt
+            // ✅ HIER IST DIE LÖSUNG: Die Slide selbst wird zur sichtbaren Karte
+            slideClassName="bg-white rounded-2xl shadow-xl overflow-hidden"
             renderSlide={renderServiceCardContent}
             effect="cards"
             className="w-full h-[520px]"
@@ -184,7 +184,7 @@ const Services = () => {
                 Leben lang in Erinnerung bleiben.
               </p>
               <button
-                className="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg touch-optimized touch-feedback prevent-zoom"
                 onClick={() => {
                   const element = document.querySelector("#contact");
                   if (element) {
