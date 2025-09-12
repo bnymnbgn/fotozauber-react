@@ -53,9 +53,9 @@ const StatCard = ({ stat }) => {
 const renderStatCardContent = (stat) => {
   const IconComponent = stat.icon;
   return (
-    <div className="text-center p-6">
+    <div className="p-6 flex flex-col h-full items-center justify-center text-center">
       <div
-        className={`w-16 h-16 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
+        className={`w-16 h-16 bg-gradient-to-br ${stat.gradient} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg flex-shrink-0`}
       >
         <IconComponent className="w-8 h-8 text-white" />
       </div>
@@ -82,7 +82,10 @@ const HoverComparisonSection = memo(() => {
   };
 
   return (
-    <section className="py-20 sm:py-32 bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
+    <section
+      id="comparison"
+      className="py-20 sm:py-32 bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden"
+    >
       <div className="container relative z-10 mx-auto px-4 max-w-7xl">
         {/* ... (Header und Comparison Grid bleiben unverändert) ... */}
         <div className="text-center mb-16">
@@ -113,10 +116,10 @@ const HoverComparisonSection = memo(() => {
         {/* Stats Section */}
         <div className="md:hidden">
           <CustomSwiper
+            variant="cards"
             items={statsData}
-            // Wir übergeben die Container-Styles an die Slide
-            slideClassName="flex items-center justify-center rounded-2xl bg-white shadow-xl"
-            // und rendern nur noch den Inhalt
+            // ✅ HIER WIRD DIE GLEICHE LOGIK WIE BEI SERVICES ANGEWENDET
+            slideClassName="bg-white rounded-2xl shadow-xl overflow-hidden"
             renderSlide={renderStatCardContent}
             effect="cards"
             className="w-full h-[380px]"
