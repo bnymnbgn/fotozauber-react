@@ -1,4 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+// src/components/sections/Process.jsx
+
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import {
   Upload,
   MessageSquare,
@@ -8,337 +11,251 @@ import {
   Clock,
   ArrowRight,
   Sparkles,
-  Heart,
-  Zap,
   Wand2,
   Eye,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import CustomSwiper from "../ui/CustomSwiper";
+
+// Ihre Framer Motion Variants (unverändert)
+const imageLayerVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.95,
+    filter: "blur(4px)",
+    y: 10,
+  },
+  visible: (index) => ({
+    opacity: 1,
+    scale: 1,
+    filter: "blur(0px)",
+    y: 0,
+    transition: {
+      duration: 0.8,
+      delay: index * 0.1,
+      ease: [0.25, 0.46, 0.45, 0.94],
+      filter: { duration: 0.4 },
+    },
+  }),
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.4, ease: "easeInOut" },
+  },
+};
+
+const stepButtonVariants = {
+  inactive: {
+    scale: 1,
+    y: 0,
+    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)",
+  },
+  active: {
+    scale: 1.02,
+    y: -2,
+    boxShadow:
+      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    transition: { type: "spring", stiffness: 300, damping: 20 },
+  },
+  hover: {
+    scale: 1.01,
+    y: -1,
+    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.08)",
+    transition: { type: "spring", stiffness: 400, damping: 25 },
+  },
+  tap: {
+    scale: 0.98,
+    transition: { duration: 0.1 },
+  },
+};
+
+const iconVariants = {
+  inactive: { rotate: 0, scale: 1 },
+  active: {
+    rotate: [0, -5, 5, -5, 5, 0],
+    scale: 1.1,
+    transition: {
+      rotate: { duration: 0.6, ease: "easeInOut" },
+      scale: { type: "spring", stiffness: 300, damping: 20 },
+    },
+  },
+};
+
+const progressBarVariants = {
+  initial: { scaleX: 0 },
+  animate: (progress) => ({
+    scaleX: progress / 100,
+    transition: { type: "spring", stiffness: 100, damping: 15, mass: 0.8 },
+  }),
+};
+
+// Daten der Schritte (unverändert)
+const steps = [
+  {
+    id: 1,
+    icon: Upload,
+    title: "Bilder hochladen",
+    description:
+      "Laden Sie Ihre Lieblingsbilder ganz einfach über unser sicheres Upload-System hoch.",
+    duration: "2 Minuten",
+    image: "/assets/transforms/1.webp",
+  },
+  {
+    id: 2,
+    icon: MessageSquare,
+    title: "Beratung & Themenwahl",
+    description: "Hier legen wir den Grundstein für Ihr persönliches Unikat.",
+    duration: "30 Minuten",
+    image: "/assets/transforms/2.png",
+  },
+  {
+    id: 3,
+    icon: Palette,
+    title: "Konzept & Planung",
+    description:
+      "Wir erstellen ein detailliertes Konzept und zeigen den geplanten Weg.",
+    duration: "1-2 Tage",
+    image: "/assets/transforms/3.png",
+  },
+  {
+    id: 4,
+    icon: Wand2,
+    title: "Magische Transformation",
+    description: "Unsere Künstler erwecken Ihre Vision zum Leben.",
+    duration: "3-5 Tage",
+    image: "/assets/transforms/4.webp",
+  },
+  {
+    id: 5,
+    icon: Eye,
+    title: "Erste Vorschau",
+    description:
+      "Sie erhalten eine Vorschau und können Änderungswünsche äußern.",
+    duration: "24 Stunden",
+    image: "/assets/transforms/5.png",
+  },
+  {
+    id: 6,
+    icon: CheckCircle,
+    title: "Finale Bearbeitung",
+    description: "Nach Ihrer Freigabe optimieren wir alle Details.",
+    duration: "1-2 Tage",
+    image: "/assets/transforms/6.png",
+  },
+  {
+    id: 7,
+    icon: Download,
+    title: "Download & Lieferung",
+    description:
+      "Ihre fertigen Kunstwerke werden in höchster Qualität bereitgestellt.",
+    duration: "Sofort",
+    image: "/assets/transforms/7.webp",
+  },
+];
+
+// Enhanced Mobile Swiper Render Function
+const renderProcessStepSlide = (step, slideIndex) => {
+  const IconComponent = step.icon;
+  const imagesToShow = steps.slice(0, slideIndex + 1);
+
+  return (
+    <motion.div
+      className="w-full h-full flex flex-col"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+    >
+      <motion.div className="relative rounded-2xl overflow-hidden shadow-xl bg-gray-100 aspect-[3/4] mb-6">
+        <AnimatePresence>
+          {imagesToShow.map((imgStep, imgIndex) => (
+            <motion.img
+              key={`img-layer-${imgStep.id}`} // *** DIE ENTSCHEIDENDE KORREKTUR ***
+              src={imgStep.image}
+              alt={`Bearbeitungsschritt ${imgIndex + 1}`}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ zIndex: imgIndex + 1, willChange: "transform, opacity" }}
+              custom={imgIndex}
+              variants={imageLayerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              loading="lazy"
+            />
+          ))}
+        </AnimatePresence>
+      </motion.div>
+
+      <motion.div
+        className="text-center px-2 flex-grow flex flex-col"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+      >
+        <div className="flex items-center justify-center space-x-3 mb-3">
+          <motion.div
+            className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <IconComponent className="w-5 h-5" />
+          </motion.div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">
+              {step.id}. {step.title}
+            </h3>
+          </div>
+        </div>
+        <div className="flex items-center justify-center space-x-2 mb-4">
+          <Clock className="w-4 h-4 text-gray-500" />
+          <span className="text-sm text-gray-600 font-medium">
+            {step.duration}
+          </span>
+        </div>
+        <p className="text-base text-gray-700 leading-relaxed flex-grow">
+          {step.description}
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+};
 
 const Process = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [currentX, setCurrentX] = useState(0);
-  const [translateX, setTranslateX] = useState(0);
-
-  const timelineRef = useRef(null);
-  const imageRefsMobile = useRef([]);
-  const imageRefsDesktop = useRef([]);
   const leftColumnRef = useRef(null);
   const rightColumnRef = useRef(null);
-  const mobileContainerRef = useRef(null);
-  const touchStartX = useRef(0);
-  const autoPlayTimeout = useRef(null);
+  const progressControls = useAnimation();
 
-  // Screen size detection
   useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
+    if (!isAutoPlaying || window.innerWidth < 1024) return;
 
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-    return () => window.removeEventListener("resize", checkIsMobile);
-  }, []);
+    let startTime = Date.now();
+    let animationFrameId;
 
-  // Steps data
-  // Daten der Schritte
-  const steps = [
-    {
-      id: 1,
-      icon: Upload,
-      title: "Bilder hochladen",
-      description:
-        "Laden Sie Ihre Lieblingsbilder ganz einfach über unser sicheres Upload-System hoch.",
-      details: [
-        "Drag & Drop oder direkter Upload",
-        "Unterstützt alle gängigen Formate",
-        "Bis zu 10 Bilder pro Auftrag",
-        "Sichere Datenübertragung",
-      ],
-      duration: "2 Minuten",
-      color: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200",
-      image: "/assets/transforms/1.webp",
-    },
-    {
-      id: 2,
-      icon: MessageSquare,
-      title: "Beratung & Themenwahl",
-      description:
-        "Hier legen wir den Grundstein für Ihr persönliches Unikat. Welches magische Thema soll es werden?",
-      details: [
-        "Persönliche Beratung",
-        "Themen-Portfolio durchschauen",
-        "Individuelle Konzeptentwicklung",
-        "Erstberatung",
-      ],
-      duration: "30 Minuten",
-      color: "from-green-500 to-green-600",
-      bgColor: "bg-green-50",
-      borderColor: "border-green-200",
-      image: "/assets/transforms/2.png",
-    },
-    {
-      id: 3,
-      icon: Palette,
-      title: "Konzept & Planung",
-      description:
-        "Wir erstellen ein detailliertes Konzept und zeigen Ihnen den geplanten Bearbeitungsweg.",
-      details: [
-        "Detaillierte Konzepterstellung",
-        "Farbpalette & Stimmung festlegen",
-        "Technische Machbarkeitsprüfung",
-        "Zeitplanung besprechen",
-      ],
-      duration: "1-2 Tage",
-      color: "from-purple-500 to-purple-600",
-      bgColor: "bg-purple-50",
-      borderColor: "border-purple-200",
-      image: "/assets/transforms/3.png",
-    },
-    {
-      id: 4,
-      icon: Wand2,
-      title: "Magische Transformation",
-      description:
-        "Unsere Künstler erwecken Ihre Vision zum Leben und erschaffen einzigartige Kunstwerke.",
-      details: [
-        "Professionelle Bildbearbeitung",
-        "Kreative Compositing-Techniken",
-        "KI-unterstützte Verbesserungen",
-        "Zwischenstatus per E-Mail",
-      ],
-      duration: "3-5 Tage",
-      color: "from-indigo-500 to-indigo-600",
-      bgColor: "bg-indigo-50",
-      borderColor: "border-indigo-200",
-      image: "/assets/transforms/4.webp",
-    },
-    {
-      id: 5,
-      icon: Eye,
-      title: "Erste Vorschau",
-      description:
-        "Sie erhalten eine erste Vorschau zur Begutachtung und können Änderungswünsche äußern.",
-      details: [
-        "Hochauflösende Vorschau-Datei",
-        "Detailliertes Feedback möglich",
-      ],
-      duration: "24 Stunden",
-      color: "from-amber-500 to-amber-600",
-      bgColor: "bg-amber-50",
-      borderColor: "border-amber-200",
-      image: "/assets/transforms/5.png",
-    },
-    {
-      id: 6,
-      icon: CheckCircle,
-      title: "Finale Bearbeitung",
-      description:
-        "Nach Ihrer Freigabe führen wir die finalen Anpassungen durch und optimieren alle Details.",
-      details: [
-        "Finale Detailoptimierung",
-        "Farbkorrekturen & Feintuning",
-        "Qualitätskontrolle",
-        "Mehrere Ausgabeformate erstellen",
-      ],
-      duration: "1-2 Tage",
-      color: "from-emerald-500 to-emerald-600",
-      bgColor: "bg-emerald-50",
-      borderColor: "border-emerald-200",
-      image: "/assets/transforms/6.png",
-    },
-    {
-      id: 7,
-      icon: Download,
-      title: "Download & Lieferung",
-      description:
-        "Ihre fertigen Kunstwerke werden in höchster Qualität zum Download bereitgestellt.",
-      details: [
-        "Hochauflösende Qualität (300 DPI)",
-        "Verschiedene Formate (JPEG, PNG, TIFF)",
-        "Druckfertige Dateien",
-      ],
-      duration: "Sofort",
-      color: "from-pink-500 to-pink-600",
-      bgColor: "bg-pink-50",
-      borderColor: "border-pink-200",
-      image: "/assets/transforms/7.webp",
-    },
-  ];
+    const updateProgress = () => {
+      const elapsed = Date.now() - startTime;
+      let newProgress = (elapsed / 8000) * 100;
 
-  // Touch/Swipe handlers for mobile
-  const handleTouchStart = useCallback(
-    (e) => {
-      if (!isMobile) return;
-
-      setIsDragging(true);
-      setIsAutoPlaying(false);
-      const touch = e.touches[0];
-      setStartX(touch.clientX);
-      setCurrentX(touch.clientX);
-      touchStartX.current = touch.clientX;
-
-      // Clear any existing auto-play timeout
-      if (autoPlayTimeout.current) {
-        clearTimeout(autoPlayTimeout.current);
-      }
-    },
-    [isMobile]
-  );
-
-  const handleTouchMove = useCallback(
-    (e) => {
-      if (!isDragging || !isMobile) return;
-
-      e.preventDefault();
-      const touch = e.touches[0];
-      setCurrentX(touch.clientX);
-
-      const deltaX = touch.clientX - startX;
-      const containerWidth = mobileContainerRef.current?.offsetWidth || 0;
-      const threshold = containerWidth * 0.15; // 15% of container width
-
-      // Limit the drag distance
-      const maxDrag = Math.min(Math.abs(deltaX), threshold);
-      const limitedDeltaX = deltaX > 0 ? maxDrag : -maxDrag;
-
-      setTranslateX(limitedDeltaX);
-    },
-    [isDragging, startX, isMobile]
-  );
-
-  const handleTouchEnd = useCallback(() => {
-    if (!isDragging || !isMobile) return;
-
-    setIsDragging(false);
-
-    const deltaX = currentX - startX;
-    const containerWidth = mobileContainerRef.current?.offsetWidth || 0;
-    const threshold = containerWidth * 0.2; // 20% swipe threshold
-
-    if (Math.abs(deltaX) > threshold) {
-      if (deltaX > 0 && activeStep > 0) {
-        // Swipe right - previous step
-        changeStep(activeStep - 1);
-      } else if (deltaX < 0 && activeStep < steps.length - 1) {
-        // Swipe left - next step
-        changeStep(activeStep + 1);
-      }
-    }
-
-    // Reset transform
-    setTranslateX(0);
-
-    // Resume autoplay after a delay
-    autoPlayTimeout.current = setTimeout(() => {
-      setIsAutoPlaying(true);
-    }, 3000);
-  }, [isDragging, currentX, startX, activeStep, steps.length, isMobile]);
-
-  const changeStep = useCallback(
-    (newStep) => {
-      if (newStep >= 0 && newStep < steps.length) {
-        setActiveStep(newStep);
-        setProgress(0);
-        animateImageTransition(newStep, false);
-      }
-    },
-    [steps.length]
-  );
-
-  // Mouse handlers for desktop
-  const handleMouseEnter = () => !isMobile && setIsAutoPlaying(false);
-  const handleMouseLeave = () => !isMobile && setIsAutoPlaying(true);
-
-  const handleStepClick = (index) => {
-    changeStep(index);
-    setIsAutoPlaying(false);
-    setTimeout(() => setIsAutoPlaying(true), 5000);
-  };
-
-  // Animation logic
-  const animateSpecificLayer = (imgElement, stepIndex) => {
-    if (!imgElement) return;
-
-    imgElement.style.transition = "all 0.8s ease-out";
-    imgElement.style.opacity = "1";
-    imgElement.style.transform = "translateY(0px) scale(1)";
-  };
-
-  const animateImageTransition = (stepIndex, immediate = false) => {
-    const currentRefs = isMobile
-      ? imageRefsMobile.current
-      : imageRefsDesktop.current;
-
-    currentRefs.forEach((img, index) => {
-      if (!img) return;
-
-      if (isMobile) {
-        // Mobile: Use CSS-based transitions (don't override inline styles)
-        // The mobile images handle their own transitions via CSS classes
+      if (newProgress >= 100) {
+        setActiveStep((current) => {
+          const nextStep = (current + 1) % steps.length;
+          startTime = Date.now(); // Reset timer for the new step
+          setProgress(0);
+          return nextStep;
+        });
         return;
       }
+      setProgress(newProgress);
+      animationFrameId = requestAnimationFrame(updateProgress);
+    };
 
-      // Desktop: Keep existing logic
-      if (index <= stepIndex) {
-        img.style.zIndex = 10 + index;
-        img.style.display = "block";
-        if (index === stepIndex && !immediate) {
-          img.style.opacity = "0";
-          img.style.transform = "translateY(20px) scale(0.95)";
-          setTimeout(() => animateSpecificLayer(img, index), 50);
-        } else {
-          img.style.opacity = "1";
-          img.style.transform = "translateY(0px) scale(1)";
-        }
-      } else {
-        img.style.opacity = "0";
-        img.style.zIndex = "1";
-        img.style.display = "none";
-      }
-    });
-  };
-
-  // Auto-play logic
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      animateImageTransition(0, true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+    animationFrameId = requestAnimationFrame(updateProgress);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [isAutoPlaying, activeStep]);
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          setActiveStep((current) => {
-            if (isTransitioning) return current;
-            setIsTransitioning(true);
-            const nextStep = current >= steps.length - 1 ? 0 : current + 1;
-            animateImageTransition(nextStep, false);
-            setTimeout(() => setIsTransitioning(false), 100);
-            return nextStep;
-          });
-          return 0;
-        }
-        return prev + 1;
-      });
-    }, 80);
-    return () => clearInterval(interval);
-  }, [isAutoPlaying, steps.length]);
+    progressControls.start("animate");
+  }, [progress, progressControls]);
 
-  // Height synchronization for desktop
   useEffect(() => {
     const setMatchingHeight = () => {
       if (
@@ -348,415 +265,245 @@ const Process = () => {
       ) {
         const leftHeight = leftColumnRef.current.offsetHeight;
         rightColumnRef.current.style.height = `${leftHeight}px`;
-      } else if (rightColumnRef.current) {
-        rightColumnRef.current.style.height = "auto";
       }
     };
-
-    const timer = setTimeout(setMatchingHeight, 100);
-    window.addEventListener("resize", setMatchingHeight);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("resize", setMatchingHeight);
-    };
-  }, [steps, activeStep]);
-
-  // Clean up
-  useEffect(() => {
-    return () => {
-      if (autoPlayTimeout.current) {
-        clearTimeout(autoPlayTimeout.current);
-      }
-    };
-  }, []);
-
-  // Features data
-  const features = [
-    {
-      icon: CheckCircle,
-      title: "Zufriedenheitsgarantie",
-      description: "Wir kümmern uns um Sie, bis Sie 100% zufrieden sind",
-    },
-    {
-      icon: Clock,
-      title: "Schnelle Bearbeitung",
-      description: "Express-Service in 24-48h gegen Aufpreis verfügbar",
-    },
-    {
-      icon: Heart,
-      title: "Persönlicher Service",
-      description: "Direkter Kontakt zu Ihrem persönlichen Bildbearbeiter",
-    },
-    {
-      icon: Zap,
-      title: "Modernste Technik",
-      description: "KI-unterstützte Workflows für beste Ergebnisse",
-    },
-  ];
+    const resizeObserver = new ResizeObserver(setMatchingHeight);
+    if (leftColumnRef.current) {
+      resizeObserver.observe(leftColumnRef.current);
+    }
+    setMatchingHeight();
+    return () => resizeObserver.disconnect();
+  }, [activeStep]);
 
   return (
     <section
       id="process"
       className="py-16 md:py-24 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden"
     >
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-20 w-32 h-32 bg-blue-400 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-40 right-10 w-40 h-40 bg-purple-400 rounded-full blur-3xl"></div>
-      </div>
-
       <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
-        <div className="text-center mb-12 md:mb-16">
-          <div className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 rounded-full px-4 py-2 text-sm font-medium mb-6">
+        <motion.div
+          className="text-center mb-12 md:mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <motion.div
+            className="inline-flex items-center space-x-2 bg-blue-100 text-blue-700 rounded-full px-4 py-2 text-sm font-medium mb-6"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
             <Sparkles className="w-4 h-4" />
             <span>SO FUNKTIONIERT ES</span>
-          </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          </motion.div>
+          <motion.h2
+            className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
             Magische
-            <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <motion.span
+              className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
+              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              style={{ backgroundSize: "200% 200%" }}
+            >
               Transformation
-            </span>
-          </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            </motion.span>
+          </motion.h2>
+          <motion.p
+            className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
             Von der ersten Idee bis zum fertigen Kunstwerk - so einfach und
             transparent ist der Weg zu Ihren magischen Erinnerungen.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        {/* Interactive Section */}
-        <div
-          className="max-w-6xl mx-auto mb-16 md:mb-20"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+        <motion.div
+          className="lg:hidden mb-16"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
         >
-          {/* Mobile Layout with Swiper */}
-          <div className="lg:hidden">
-            {/* Mobile: Swiper Container */}
-            <div
-              ref={mobileContainerRef}
-              className="relative select-none overflow-hidden"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              {/* Mobile: Image Container - static during swipe */}
-              <div className="relative rounded-2xl overflow-hidden shadow-xl bg-gray-100 aspect-[3/4] mb-6">
-                {/* Image Container */}
-                <div className="w-full h-full">
-                  {steps.map((step, index) => (
-                    <img
-                      key={index}
-                      src={step.image}
-                      alt={step.title}
-                      className="absolute inset-0 w-full h-full object-cover transition-all duration-800 ease-out"
-                      ref={(el) => (imageRefsMobile.current[index] = el)}
-                      style={{
-                        opacity: index <= activeStep ? 1 : 0,
-                        transform:
-                          index === activeStep
-                            ? "translateY(0px) scale(1)"
-                            : index < activeStep
-                            ? "translateY(0px) scale(1)"
-                            : "translateY(20px) scale(0.95)",
-                        zIndex: index + 1,
-                        display: "block",
-                      }}
-                    />
-                  ))}
-                </div>
+          <CustomSwiper
+            items={steps}
+            renderSlide={(step, index) => renderProcessStepSlide(step, index)}
+            effect="coverflow"
+            slideClassName="bg-white rounded-2xl p-4 shadow-md"
+            className="w-full h-[620px]"
+            swiperProps={{ style: { paddingBottom: "50px" } }}
+          />
+        </motion.div>
 
-                {/* Mobile: Overlay with Step-Info */}
-                <div className="absolute inset-0 bg-gradient-to-t via-transparent to-transparent"></div>
-                <div
-                  key={activeStep}
-                  className="absolute bottom-0 left-0 right-0 p-4 md:p-6 text-white z-20 
-                   bg-gradient-to-t from-black/70 via-black/10 to-transparent"
-                >
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
-                      {(() => {
-                        const IconComponent = steps[activeStep].icon;
-                        return <IconComponent className="w-5 h-5" />;
-                      })()}
-                    </div>
-                    <div>
-                      <h3 className="text-xl md:text-2xl font-bold drop-shadow-lg">
-                        {activeStep + 1}. {steps[activeStep].title}
-                      </h3>
-                      <div className="flex items-center space-x-2 mt-2">
-                        <Clock className="w-4 h-4 text-gray-200" />
-                        <span className="text-sm text-gray-200 font-medium">
-                          {steps[activeStep].duration}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-base md:text-lg text-gray-100 leading-relaxed mt-3 drop-shadow-md font-medium">
-                    {steps[activeStep].description}
-                  </p>
-                </div>
-
-                {/* Mobile: Navigation Arrows (subtle) */}
-                {activeStep > 0 && (
-                  <button
-                    onClick={() => changeStep(activeStep - 1)}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 backdrop-blur-sm text-white p-2 rounded-full opacity-70 hover:opacity-100 transition-all duration-200"
-                  >
-                    <ChevronLeft className="w-5 h-5" />
-                  </button>
-                )}
-
-                {activeStep < steps.length - 1 && (
-                  <button
-                    onClick={() => changeStep(activeStep + 1)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-white/20 backdrop-blur-sm text-white p-2 rounded-full opacity-70 hover:opacity-100 transition-all duration-200"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                )}
-
-                {/* Mobile: Step Indicators (Dots) */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex space-x-2">
-                  {steps.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => changeStep(index)}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        index === activeStep
-                          ? "bg-white scale-125"
-                          : "bg-white/40 hover:bg-white/60"
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                {/* Mobile: Progress Bar */}
-                <div className="absolute top-4 left-4 right-4 z-30">
-                  <div className="h-1 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-400 to-purple-400 transition-all duration-100 ease-linear"
-                      style={{
-                        width: `${
-                          (progress + activeStep * 100) / steps.length
-                        }%`,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Swipe Hint (only show briefly) */}
-                {activeStep === 0 && !isDragging && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 animate-pulse">
-                    <div className="bg-white/10 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm flex items-center space-x-2">
-                      <span>← Wischen zum Durchblättern →</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Mobile: Details below image */}
-              <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg">
-                <h4 className="text-lg font-bold text-gray-900 mb-4">
-                  Was passiert in diesem Schritt:
-                </h4>
-                <ul className="space-y-2">
-                  {steps[activeStep].details.map((detail, index) => (
-                    <li key={index} className="flex items-start space-x-3">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700 text-sm leading-relaxed">
-                        {detail}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Desktop Layout (unchanged) */}
-          <div className="hidden lg:grid lg:grid-cols-12 gap-x-12 gap-y-8 items-start">
-            {/* Desktop: Image Column */}
-            <div
-              ref={rightColumnRef}
-              className="lg:col-span-7 lg:sticky lg:top-24"
-            >
-              <div className="rounded-2xl shadow-xl h-full relative overflow-hidden bg-gray-100 group">
-                <div className="w-full h-full">
-                  {steps.map((step, index) => (
-                    <img
-                      key={index}
-                      src={step.image}
-                      alt={step.title}
-                      className="absolute inset-0 w-full h-full object-cover"
-                      ref={(el) => (imageRefsDesktop.current[index] = el)}
-                      style={{
-                        opacity: 0,
-                        display: "none",
-                      }}
-                    />
-                  ))}
-                </div>
-
-                <div
-                  className="absolute bottom-0 left-0 w-full z-20 step-transition p-6 md:p-8 pointer-events-none 
-                   bg-gradient-to-t from-black/60 via-black/20 to-transparent"
-                >
-                  <div>
-                    <ul className="space-y-2 mt-4 mb-5">
-                      {steps[activeStep].details.map((detail, index) => (
-                        <li key={index} className="flex items-center space-x-3">
-                          <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 drop-shadow-sm" />
-                          <span className="text-gray-100 drop-shadow-sm">
-                            {detail}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="mt-6 flex items-center space-x-3 bg-white/10 p-3 rounded-lg border border-white/20 backdrop-blur-sm">
-                      <Clock className="w-5 h-5 text-white flex-shrink-0" />
-                      <span className="font-medium text-sm text-white">
-                        Geschätzte Dauer für diesen Schritt:{" "}
-                        <span className="font-bold">
-                          {steps[activeStep].duration}
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Desktop: Steps Column */}
-            <div ref={leftColumnRef} className="lg:col-span-5 space-y-4">
-              {steps.map((step, index) => {
-                const IconComponent = step.icon;
-                const isActive = activeStep === index;
-
-                return (
-                  <button
+        <motion.div
+          className="hidden lg:grid lg:grid-cols-12 gap-x-12 items-start max-w-6xl mx-auto"
+          onMouseEnter={() => setIsAutoPlaying(false)}
+          onMouseLeave={() => setIsAutoPlaying(true)}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <motion.div
+            ref={rightColumnRef}
+            className="lg:col-span-7 lg:sticky lg:top-24"
+          >
+            <div className="rounded-2xl shadow-xl h-full relative overflow-hidden bg-gray-100 group">
+              <AnimatePresence>
+                {steps.slice(0, activeStep + 1).map((step, index) => (
+                  <motion.img
                     key={step.id}
-                    onClick={() => handleStepClick(index)}
-                    className={`w-full text-left p-4 rounded-2xl transition-all duration-300 border ${
-                      isActive
-                        ? "bg-white shadow-xl scale-[1.02] border-purple-200 ring-1 ring-purple-100"
-                        : "bg-gray-50 border-transparent hover:bg-white hover:shadow-lg hover:border-gray-200"
-                    }`}
-                  >
-                    <div className="flex space-x-4">
-                      <div
-                        className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 ${
-                          isActive
-                            ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-md"
-                            : "bg-gray-200 text-gray-600"
+                    src={step.image}
+                    alt={`Bearbeitungsschritt ${index + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    style={{
+                      zIndex: index + 1,
+                      willChange: "transform, opacity",
+                    }}
+                    custom={index}
+                    variants={imageLayerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    loading="lazy"
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+
+          <div ref={leftColumnRef} className="lg:col-span-5 space-y-4">
+            {steps.map((step, index) => {
+              const isActive = activeStep === index;
+              return (
+                <motion.button
+                  key={step.id}
+                  onClick={() => setActiveStep(index)}
+                  className={`w-full text-left p-4 rounded-2xl transition-colors duration-300 border ${
+                    isActive
+                      ? "bg-white border-purple-200"
+                      : "bg-gray-50 border-transparent"
+                  }`}
+                  variants={stepButtonVariants}
+                  animate={isActive ? "active" : "inactive"}
+                  whileHover="hover"
+                  whileTap="tap"
+                  layout
+                >
+                  <div className="flex space-x-4">
+                    <motion.div
+                      className={`flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 ${
+                        isActive
+                          ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white"
+                          : "bg-gray-200 text-gray-600"
+                      }`}
+                      variants={iconVariants}
+                      animate={isActive ? "active" : "inactive"}
+                    >
+                      <step.icon className="w-6 h-6" />
+                    </motion.div>
+                    <div className="flex-1">
+                      <h3
+                        className={`font-bold text-base transition-colors duration-300 ${
+                          isActive ? "text-gray-900" : "text-gray-700"
                         }`}
                       >
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3
-                          className={`font-bold text-base transition-colors ${
-                            isActive ? "text-gray-900" : "text-gray-700"
-                          }`}
-                        >
-                          {index + 1}. {step.title}
-                        </h3>
-                        <p className="text-sm text-gray-500 leading-snug mt-1">
-                          {step.description}
-                        </p>
-                      </div>
+                        {index + 1}. {step.title}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {step.description}
+                      </p>
                     </div>
-
+                  </div>
+                  <AnimatePresence>
                     {isActive && (
-                      <div className="mt-4 h-1 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-100 ease-linear"
-                          style={{ width: `${progress}%` }}
-                        ></div>
-                      </div>
+                      <motion.div
+                        className="mt-4 h-1 bg-gray-100 rounded-full overflow-hidden"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 4 }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <motion.div
+                          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 origin-left"
+                          custom={progress}
+                          variants={progressBarVariants}
+                          initial="initial"
+                          animate={progressControls}
+                        />
+                      </motion.div>
                     )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Features Section */}
-        <div className="mb-16">
-          {/* Mobile Ansicht: Swiper */}
-          <div className="md:hidden">
-            <CustomSwiper
-              items={features}
-              effect="cards"
-              slideClassName="bg-white rounded-2xl shadow-lg"
-              renderSlide={(feature) => {
-                const IconComponent = feature.icon;
-                return (
-                  <div className="text-center p-6 h-full">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                      {feature.title}
-                    </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </div>
-                );
-              }}
-              className="w-full h-[280px]"
-              swiperProps={{
-                style: { paddingBottom: "50px" },
-              }}
-            />
-          </div>
-
-          {/* Desktop Ansicht: Grid */}
-          <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature) => {
-              const IconComponent = feature.icon;
-              return (
-                <div
-                  key={feature.id} // Besser die ID aus dem Array verwenden
-                  className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-full"
-                >
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <IconComponent className="w-6 h-6 text-white" />
-                  </div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                    {feature.title}
-                  </h4>
-                  <p className="text-sm text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
+                  </AnimatePresence>
+                </motion.button>
               );
             })}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Call to Action */}
-        <div className="text-center bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-8 md:p-12 text-white">
-          <h3 className="text-2xl md:text-3xl font-bold mb-4">
+        <motion.div
+          className="text-center bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-8 md:p-12 text-white mt-16 max-w-6xl mx-auto"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <motion.h3
+            className="text-2xl md:text-3xl font-bold mb-4"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
             Bereit für den ersten Schritt?
-          </h3>
-          <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+          </motion.h3>
+          <motion.p
+            className="text-lg text-white/90 mb-8 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
             Starten Sie noch heute Ihre magische Transformation. Der Upload
             Ihrer Bilder dauert nur wenige Minuten.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-purple-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
-              Jetzt Bilder hochladen
-              <ArrowRight className="w-5 h-5 ml-2 inline" />
-            </button>
-            <button className="border-2 border-white text-white hover:bg-white hover:text-purple-600 font-semibold py-4 px-8 rounded-full transition-all duration-300">
-              Beispiele ansehen
-            </button>
-          </div>
-        </div>
+          </motion.p>
+          <motion.button
+            className="bg-white text-purple-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-full transition-colors duration-300 shadow-lg"
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2)",
+            }}
+            whileTap={{ scale: 0.98 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+              delay: 0.6,
+            }}
+          >
+            Jetzt Bilder hochladen
+            <motion.div
+              className="inline-block ml-2"
+              animate={{ x: [0, 4, 0] }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            >
+              <ArrowRight className="w-5 h-5" />
+            </motion.div>
+          </motion.button>
+        </motion.div>
       </div>
     </section>
   );

@@ -130,7 +130,7 @@ const Services = () => {
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
             Professionelle
-            <span className="block bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent pb-2">
               Bildbearbeitung
             </span>
           </h2>
@@ -150,7 +150,7 @@ const Services = () => {
             slideClassName="bg-white rounded-2xl shadow-xl overflow-hidden"
             renderSlide={renderServiceCardContent}
             effect="cards"
-            className="w-full h-[520px]"
+            className="w-full pb-2"
             swiperProps={{
               style: {
                 paddingBottom: "50px",

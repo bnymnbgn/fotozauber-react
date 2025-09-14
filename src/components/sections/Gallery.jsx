@@ -3,7 +3,7 @@
 import { useState, memo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, X, Shield } from "lucide-react";
-import { useGallery } from "../../hooks/useGallery";
+import { useGallery } from "@/lib/hooks/useGallery";
 import { galleryImages } from "../../data/content";
 import { cn } from "../../utils/cn";
 
@@ -247,7 +247,7 @@ const Gallery = memo(() => {
         >
           {filteredImages.map((image, index) => {
             let className = "";
-            
+
             // Perfektes Layout ohne Gaps - manuelle Positionierung
             if (index === 0 || index === 5) {
               className = "row-span-2"; // Hohe Bilder

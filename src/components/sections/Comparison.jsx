@@ -1,9 +1,10 @@
 import { useState, useEffect, memo } from "react";
-import { Timer, Sparkles, Eye, X } from "lucide-react";
+import { Timer, Sparkles, Eye, X, ArrowRight } from "lucide-react";
 import Modal from "../ui/Modal";
 import { comparisons } from "../../data/content";
 import HoverComparisonSlider from "../ui/HoverComparisonSlider";
 import CustomSwiper from "../ui/CustomSwiper";
+import Button from "../ui/Button";
 
 const statsData = [
   {
@@ -122,7 +123,7 @@ const HoverComparisonSection = memo(() => {
             slideClassName="bg-white rounded-2xl shadow-xl overflow-hidden"
             renderSlide={renderStatCardContent}
             effect="cards"
-            className="w-full h-[380px]"
+            className="w-full pb-2"
             swiperProps={{
               style: {
                 paddingBottom: "50px",
@@ -146,22 +147,19 @@ const HoverComparisonSection = memo(() => {
             Laden Sie Ihr Bild hoch und erleben Sie die Magie unserer
             Bearbeitung
           </p>
-          <button className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
-            <span>Jetzt kostenlos testen</span>
-            <svg
-              className="ml-2 w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
-              />
-            </svg>
-          </button>
+          <Button
+            variant="primary"
+            size="lg"
+            onClick={() => {
+              const element = document.querySelector("#contact");
+              if (element) {
+                element.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+          >
+            <span>Jetzt unverbindlich anfragen</span>
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
         </div>
       </div>
       <Modal

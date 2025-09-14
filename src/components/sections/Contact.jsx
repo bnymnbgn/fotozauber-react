@@ -13,25 +13,39 @@ import {
   Star,
 } from "lucide-react";
 import axios from "axios";
+import Toast from "../ui/Toast";
 
 const Contact = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm({
+    mode: "onBlur",
+  });
 
   const handleFileUpload = (event) => {
     const files = Array.from(event.target.files);
-    const validFiles = files.filter((file) => {
-      const validTypes = ["image/jpeg", "image/png", "image/tiff", "image/raw"];
-      const maxSize = 10 * 1024 * 1024; // 10MB
-      return validTypes.includes(file.type) && file.size <= maxSize;
+    const validFiles = [];
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    const validTypes = ["image/jpeg", "image/png", "image/tiff", "image/raw"];
+
+    files.forEach((file) => {
+      if (!validTypes.includes(file.type)) {
+        setToastMessage(`Dateityp nicht unterstützt: ${file.name}`);
+        return; // Nächste Datei prüfen
+      }
+      if (file.size > maxFileSize) {
+        setToastMessage(`Datei ist zu groß (max. 10MB): ${file.name}`);
+        return; // Nächste Datei prüfen
+      }
+      validFiles.push(file);
     });
 
     const newFiles = validFiles.map((file) => ({
@@ -44,7 +58,6 @@ const Contact = () => {
 
     setUploadedFiles((prev) => [...prev, ...newFiles]);
   };
-
   const removeFile = (fileId) => {
     setUploadedFiles((prev) => {
       const fileToRemove = prev.find((f) => f.id === fileId);
@@ -453,6 +466,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
+      <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />
     </section>
   );
 };

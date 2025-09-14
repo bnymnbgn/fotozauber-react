@@ -244,7 +244,20 @@ export const pricingPlans = [
     originalPrice: 35,
     duration: "2-3 Tage",
     popular: false,
-    description: "Perfekt für einfache Verschönerungen und Korrekturen",
+    description:
+      "Perfekt für grundlegendes Compositing und kreative Optimierungen.",
+    longDescription:
+      "Das Giraffen-Paket ist der ideale Einstieg, um Ihren Fotos den letzten Schliff zu geben. Wir optimieren Farben, Licht und kleine Details und bieten einfaches Compositing, um das Beste aus Ihren Bildern herauszuholen, ohne ihren ursprünglichen Charakter zu verändern.",
+    useCases: [
+      "Grundlegendes Compositing",
+      "Lichtkorrektur & Farbkorrektur",
+      "Einfache Hintergrundoptimierung",
+      "Basic Objekte werden hinzugefügt",
+    ],
+    exampleImages: {
+      before: "/assets/img/before.webp",
+      after: "/assets/img/after.webp",
+    },
     features: [
       "Compositing & einfache Effekte",
       "Farbkorrektur & Belichtung",
@@ -258,9 +271,7 @@ export const pricingPlans = [
       "Keine Korrekturschleifen",
     ],
     icon: "palette",
-    color: "from-blue-500 to-blue-600",
     bgColor: "bg-blue-50",
-    borderColor: "border-blue-200",
   },
   {
     id: "creative",
@@ -269,7 +280,19 @@ export const pricingPlans = [
     originalPrice: 79,
     duration: "4-6 Tage",
     popular: true,
-    description: "Unsere beliebteste Wahl für magische Transformationen",
+    description: "Unsere beliebteste Wahl für magische Transformationen.",
+    longDescription:
+      "Das Zebra-Paket ist unser Bestseller und verwandelt Ihr Foto in eine komplett neue Welt. Wir ersetzen den Hintergrund, fügen kreative Elemente hinzu und erschaffen eine Szene, die die Fantasie Ihres Kindes widerspiegelt – sei es im Weltraum, unter Wasser oder im Märchenland.",
+    useCases: [
+      "Vollständige Hintergrundersetzung",
+      "Integration in Fantasiewelten",
+      "Hinzufügen von Tieren oder Objekten",
+      "Ideales Geschenk für Geburtstage",
+    ],
+    exampleImages: {
+      before: "/assets/img/TIGER before.webp",
+      after: "/assets/img/TIGER after.webp",
+    },
     features: [
       "Alles aus Giraffe",
       "Kreative Hintergrundersetzung",
@@ -282,9 +305,7 @@ export const pricingPlans = [
     ],
     limitations: [],
     icon: "wand",
-    color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-50",
-    borderColor: "border-purple-200",
   },
   {
     id: "premium",
@@ -293,7 +314,19 @@ export const pricingPlans = [
     originalPrice: 129,
     duration: "5-8 Tage",
     popular: false,
-    description: "Höchste Qualität für anspruchsvolle Kunstwerke",
+    description: "Höchste Qualität für anspruchsvolle Kunstwerke.",
+    longDescription:
+      "Das Löwen-Paket ist für diejenigen, die ein wahres Meisterwerk wünschen. Wir nutzen fortschrittlichste Techniken, KI-gestützte Verbesserungen und komplexe Multi-Layer-Composings, um ein atemberaubendes Kunstwerk zu schaffen, das für großformatige Drucke geeignet ist.",
+    useCases: [
+      "Anspruchsvolle Kunstprojekte",
+      "Großformatige Drucke (z.B. Leinwand)",
+      "Kombination mehrerer Fotos",
+      "Uneingeschränkte Korrekturschleifen",
+    ],
+    exampleImages: {
+      before: "/assets/img/Halid before.webp",
+      after: "/assets/img/Halid after.webp",
+    },
     features: [
       "Alles aus Zebra",
       "KI-unterstützte Verbesserungen",
@@ -305,9 +338,7 @@ export const pricingPlans = [
     ],
     limitations: [],
     icon: "crown",
-    color: "from-amber-500 to-orange-500",
     bgColor: "bg-amber-50",
-    borderColor: "border-amber-200",
   },
   {
     id: "family",
@@ -316,9 +347,22 @@ export const pricingPlans = [
     originalPrice: 229,
     duration: "7-10 Tage",
     popular: false,
-    description: "Perfekt für Geschwister und Familienfotos",
+    description: "Perfekt für Geschwister und Familienfotos.",
+    longDescription:
+      "Das Elefanten-Paket ist speziell für Familien konzipiert. Wir bearbeiten 3-5 Ihrer schönsten Bilder im Löwe-Stil und können dabei sogar verschiedene Themen kombinieren oder Geschwister in eine gemeinsame Fantasiewelt integrieren.",
+    useCases: [
+      "Geschwisterfotos in einem Bild",
+      "Eine Serie von 3-5 Bildern",
+      "Erstellung eines kleinen digitalen Albums",
+      "Bestes Preis-Leistungs-Verhältnis",
+    ],
+    exampleImages: {
+      before: "/assets/img/bebe before.webp",
+      after: "/assets/img/bebe after.webp",
+    },
     features: [
-      "3-5 Bilder im Zebra Stil",
+      "Alles aus Löwe",
+      "3-5 Bilder im Löwe Stil",
       "Unterschiedliche Themen & Stile",
       "Familienrabatt (25% Ersparnis)",
       "Alle Einzelbild-Features",
@@ -328,9 +372,7 @@ export const pricingPlans = [
     ],
     limitations: [],
     icon: "users",
-    color: "from-green-500 to-teal-500",
     bgColor: "bg-green-50",
-    borderColor: "border-green-200",
   },
 ];
 

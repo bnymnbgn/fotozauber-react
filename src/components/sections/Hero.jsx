@@ -3,10 +3,10 @@ import React, { useState, useRef, useEffect, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MagicCircleCard from "../ui/MagicCircleCard";
 import HoverComparisonSlider from "../ui/HoverComparisonSlider";
-import Button from "../ui/Button";
+import Button from "@/components/ui/Button.jsx";
 import Lightbox from "../ui/Lightbox";
 import { transformationExamples } from "../../data/transformationExamples";
-import useSpatialCardAnimation from "../../hooks/useSpatialCardAnimation";
+import useSpatialCardAnimation from "@/lib/hooks/useSpatialCardAnimation";
 import { AuroraText } from "@/components/magicui/aurora-text";
 
 // --- Custom Hook für Barrierefreiheit ---
@@ -55,7 +55,8 @@ const Hero = memo(() => {
   const [wordIndex, setWordIndex] = useState(0);
   const [isInView, setIsInView] = useState(false);
   const heroRef = useRef(null);
-  const { flowingCards, startAnimation, stopAnimation } = useSpatialCardAnimation(transformationExamples);
+  const { flowingCards, startAnimation, stopAnimation } =
+    useSpatialCardAnimation(transformationExamples);
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
@@ -79,7 +80,7 @@ const Hero = memo(() => {
       ([entry]) => {
         const visible = entry.isIntersecting;
         setIsInView(visible);
-        
+
         if (visible && !prefersReducedMotion) {
           startAnimation();
         } else {
@@ -88,7 +89,7 @@ const Hero = memo(() => {
       },
       {
         threshold: 0.1, // Start when 10% is visible
-        rootMargin: '-10% 0px -10% 0px' // Slightly reduce viewport
+        rootMargin: "-10% 0px -10% 0px", // Slightly reduce viewport
       }
     );
 
@@ -254,6 +255,6 @@ const Hero = memo(() => {
   );
 });
 
-Hero.displayName = 'Hero';
+Hero.displayName = "Hero";
 
 export default Hero;
