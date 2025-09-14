@@ -13,6 +13,7 @@ import {
 } from "lucide-react"; // Palette, Wand2, Crown, Users entfernt
 import { pricingPlans, pricingAddOns } from "../../data/content";
 import CustomSwiper from "../ui/CustomSwiper";
+import { Link } from "react-router-dom";
 
 const Pricing = () => {
   const [selectedPlan, setSelectedPlan] = useState("creative");
@@ -69,6 +70,154 @@ const Pricing = () => {
 
     // Alternative Logik (nur die Einsparung aus dem Plan anzeigen, wie im Originalcode):
     // return plan ? plan.originalPrice - plan.price : 0;
+  };
+
+  // Funktion zum Rendern einer Pricing Card
+  const renderPricingCard = (plan, index) => {
+    const iconSrc = iconMapping[plan.icon];
+    const isSelected = selectedPlan === plan.id;
+    const discountedPrice =
+      billingCycle === "package" ? Math.round(plan.price * 0.75) : plan.price;
+
+    return (
+      <div
+        key={plan.id}
+        className={`relative pricing-card cursor-pointer transition-all duration-500 transform hover:-translate-y-2 h-full ${
+          plan.popular ? "lg:mt-0" : ""
+        }`}
+        onClick={() => setSelectedPlan(plan.id)}
+      >
+        {/* Popular Badge */}
+        {plan.popular && (
+          <div className="absolute -top-2 right-4 z-10">
+            <div className="relative">
+              <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-md text-xs font-semibold shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
+                <Star className="w-3 h-3 inline mr-1 fill-current" />
+                BELIEBT
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-md blur-sm opacity-30 -z-10"></div>
+            </div>
+          </div>
+        )}
+
+        <div
+          className={`relative bg-white rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
+            plan.popular && !isSelected ? "ring-2 ring-purple-200" : ""
+          } ${!isSelected ? "shadow-lg hover:shadow-xl" : ""}`}
+          style={{
+            ...(isSelected
+              ? {
+                  background:
+                    "linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)",
+                  boxShadow:
+                    "0 20px 40px -12px rgba(168, 85, 247, 0.25), 0 0 25px rgba(168, 85, 247, 0.15), 0 0 50px rgba(168, 85, 247, 0.1)",
+                  transform: "scale(1.02) translateY(-4px)",
+                }
+              : {}),
+          }}
+        >
+          {/* Card Header */}
+          <div
+            className={`p-6 text-center ${plan.bgColor} border-b ${plan.borderColor}`}
+          >
+            <img
+              src={iconSrc}
+              alt={`${plan.name} Icon`}
+              className={`w-20 h-20 object-contain mx-auto mb-4 transition-transform duration-300 ease-out ${
+                isSelected ? "scale-150" : "scale-150"
+              }`}
+            />
+
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {plan.name}
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">{plan.description}</p>
+
+            {/* Price */}
+            <div className="price-display">
+              <div className="flex items-baseline justify-center space-x-2">
+                <span className="text-3xl font-bold text-gray-900">
+                  {discountedPrice}€
+                </span>
+                {billingCycle === "package" && (
+                  <span className="text-lg text-gray-500 line-through">
+                    {plan.price}€
+                  </span>
+                )}
+              </div>
+              {plan.originalPrice > plan.price && billingCycle === "single" && (
+                <div className="text-sm text-gray-500 mt-1">
+                  Statt {plan.originalPrice}€
+                  <span className="ml-2 text-green-600 font-medium">
+                    (
+                    {Math.round(
+                      ((plan.originalPrice - plan.price) / plan.originalPrice) *
+                        100
+                    )}
+                    % sparen)
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Duration */}
+            <div className="flex items-center justify-center space-x-2 mt-4 text-sm text-gray-600">
+              <Clock className="w-4 h-4" />
+              <span>{plan.duration}</span>
+            </div>
+          </div>
+
+          {/* Features */}
+          <div className="p-6 flex-1 flex flex-col">
+            <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
+              Inklusive:
+            </h4>
+            <ul className="space-y-3 flex-1">
+              {plan.features.map((feature, idx) => (
+                <li key={idx} className="flex items-start space-x-3">
+                  <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm text-gray-700">{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* Limitations */}
+            {plan.limitations.length > 0 && (
+              <div className="border-t border-gray-100 pt-4 mt-6">
+                <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                  Nicht enthalten:
+                </h4>
+                <ul className="space-y-2">
+                  {plan.limitations.map((limitation, idx) => (
+                    <li key={idx} className="flex items-start space-x-3">
+                      <X className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-gray-500">
+                        {limitation}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {/* Select Button */}
+          <div className="p-6 pt-0">
+            <button
+              className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
+                isSelected
+                  ? "bg-purple-600 text-white shadow-lg transform scale-105"
+                  : plan.popular
+                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
+                  : "border-2 border-gray-200 text-gray-700 hover:border-purple-300 hover:text-purple-600"
+              }`}
+            >
+              {isSelected ? "Ausgewählt" : "Auswählen"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -133,166 +282,62 @@ const Pricing = () => {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-          {pricingPlans.map((plan, index) => {
-            // --- ANGEPASST ---
-            const iconSrc = iconMapping[plan.icon]; // Bildquelle holen
-            const isSelected = selectedPlan === plan.id;
-            const discountedPrice =
-              billingCycle === "package"
-                ? Math.round(plan.price * 0.75)
-                : plan.price;
+        <div className="mb-16">
+          {/* Mobile Ansicht: Swiper */}
+          <div className="md:hidden">
+            <CustomSwiper
+              items={pricingPlans}
+              effect="slide"
+              className="w-full pricing-swiper"
+              swiperProps={{
+                spaceBetween: 20,
+                centeredSlides: true,
+                slidesPerView: 1.2,
+                grabCursor: true,
+                style: {
+                  paddingBottom: "20px",
+                  paddingTop: "20px",
+                },
+                breakpoints: {
+                  480: {
+                    slidesPerView: 1.5,
+                    spaceBetween: 30,
+                  },
+                  640: {
+                    slidesPerView: 2,
+                    spaceBetween: 30,
+                  },
+                },
+              }}
+              renderSlide={(plan, index) => renderPricingCard(plan, index)}
+            />
+          </div>
 
-            return (
-              <div
-                key={plan.id}
-                className={`relative pricing-card cursor-pointer transition-all duration-500 transform hover:-translate-y-2 ${
-                  plan.popular ? "lg:-mt-4 lg:mb-4" : ""
-                }`}
-                onClick={() => setSelectedPlan(plan.id)}
-              >
-                {/* Popular Badge */}
-                {plan.popular && (
-                  <div className="absolute -top-2 right-4 z-10">
-                    <div className="relative">
-                      <div className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-md text-xs font-semibold shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                        <Star className="w-3 h-3 inline mr-1 fill-current" />
-                        BELIEBT
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-md blur-sm opacity-30 -z-10"></div>
-                    </div>
-                  </div>
-                )}
+          {/* Tablet Ansicht: Swiper mit 2 Slides */}
+          <div className="hidden md:block lg:hidden">
+            <CustomSwiper
+              items={pricingPlans}
+              effect="slide"
+              className="w-full pricing-swiper"
+              swiperProps={{
+                spaceBetween: 30,
+                centeredSlides: false,
+                slidesPerView: 2,
+                grabCursor: true,
+                style: {
+                  paddingBottom: "20px",
+                  paddingTop: "20px",
+                  height: "660px", // Feste Höhe auch für Tablet
+                },
+              }}
+              renderSlide={(plan, index) => renderPricingCard(plan, index)}
+            />
+          </div>
 
-                <div
-                  className={`relative bg-white rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full ${
-                    plan.popular && !isSelected ? "ring-2 ring-purple-200" : ""
-                  } ${!isSelected ? "shadow-lg hover:shadow-xl" : ""}`}
-                  style={{
-                    ...(isSelected
-                      ? {
-                          background:
-                            "linear-gradient(135deg, #ffffff 0%, #faf5ff 100%)",
-                          boxShadow:
-                            "0 20px 40px -12px rgba(168, 85, 247, 0.25), 0 0 25px rgba(168, 85, 247, 0.15), 0 0 50px rgba(168, 85, 247, 0.1)",
-                          transform: "scale(1.02) translateY(-4px)",
-                        }
-                      : {}),
-                  }}
-                >
-                  {/* Card Header */}
-                  <div
-                    className={`p-6 text-center ${plan.bgColor} border-b ${plan.borderColor}`}
-                  >
-                    {/* Container entfernt, Layout-Klassen zum img-Tag hinzugefügt */}
-                    <img
-                      src={iconSrc}
-                      alt={`${plan.name} Icon`}
-                      className={`w-20 h-20 object-contain mx-auto mb-4 transition-transform duration-300 ease-out ${
-                        isSelected ? "scale-150" : "scale-150"
-                      }`}
-                    />
-
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      {plan.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      {plan.description}
-                    </p>
-
-                    {/* Price */}
-                    <div className="price-display">
-                      <div className="flex items-baseline justify-center space-x-2">
-                        <span className="text-3xl font-bold text-gray-900">
-                          {discountedPrice}€
-                        </span>
-                        {billingCycle === "package" && (
-                          <span className="text-lg text-gray-500 line-through">
-                            {plan.price}€
-                          </span>
-                        )}
-                      </div>
-                      {plan.originalPrice > plan.price &&
-                        billingCycle === "single" && (
-                          <div className="text-sm text-gray-500 mt-1">
-                            Statt {plan.originalPrice}€
-                            <span className="ml-2 text-green-600 font-medium">
-                              (
-                              {Math.round(
-                                ((plan.originalPrice - plan.price) /
-                                  plan.originalPrice) *
-                                  100
-                              )}
-                              % sparen)
-                            </span>
-                          </div>
-                        )}
-                    </div>
-
-                    {/* Duration */}
-                    <div className="flex items-center justify-center space-x-2 mt-4 text-sm text-gray-600">
-                      <Clock className="w-4 h-4" />
-                      <span>{plan.duration}</span>
-                    </div>
-                  </div>
-
-                  {/* Features */}
-                  <div className="p-6 flex-1 flex flex-col">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-4 uppercase tracking-wide">
-                      Inklusive:
-                    </h4>
-                    <ul className="space-y-3 flex-1">
-                      {plan.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start space-x-3">
-                          <Check className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-gray-700">
-                            {feature}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* Limitations */}
-                    {plan.limitations.length > 0 && (
-                      <div className="border-t border-gray-100 pt-4 mt-6">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                          Nicht enthalten:
-                        </h4>
-                        <ul className="space-y-2">
-                          {plan.limitations.map((limitation, idx) => (
-                            <li
-                              key={idx}
-                              className="flex items-start space-x-3"
-                            >
-                              <X className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-gray-500">
-                                {limitation}
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Select Button */}
-                  <div className="p-6 pt-0">
-                    <button
-                      className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
-                        isSelected
-                          ? "bg-purple-600 text-white shadow-lg transform scale-105"
-                          : plan.popular
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700"
-                          : "border-2 border-gray-200 text-gray-700 hover:border-purple-300 hover:text-purple-600"
-                      }`}
-                    >
-                      {isSelected ? "Ausgewählt" : "Auswählen"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {/* Desktop Ansicht: Grid (wie gehabt) */}
+          <div className="hidden lg:grid grid-cols-4 gap-8">
+            {pricingPlans.map((plan, index) => renderPricingCard(plan, index))}
+          </div>
         </div>
 
         {/* Add-Ons Section */}
@@ -395,6 +440,17 @@ const Pricing = () => {
               );
             })}
           </div>
+        </div>
+
+        {/* HIER DEN LINK EINFÜGEN, nach dem Grid */}
+        <div className="text-center mt-16">
+          <Link
+            to="/pricing"
+            className="text-lg font-semibold text-purple-600 hover:text-purple-800 transition-colors"
+          >
+            Alle Pakete im Detail vergleichen{" "}
+            <ArrowRight className="inline w-5 h-5" />
+          </Link>
         </div>
 
         {/* Summary & CTA */}

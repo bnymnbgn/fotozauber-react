@@ -15,6 +15,7 @@ import {
   Clock,
 } from "lucide-react";
 import FontSizeControl from "../ui/FontSizeControl";
+import Button from "../ui/Button";
 
 const Footer = () => {
   const navigate = useNavigate(); // 2. useNavigate hook
@@ -280,13 +281,14 @@ const Footer = () => {
 
       {/* Floating Action Button für Kontakt */}
       <div className="fixed bottom-6 right-6 z-50">
-        <button
+        <Button
+          variant="primary"
+          size="icon"
           onClick={() => handleLinkClick("#contact")}
-          className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
           aria-label="Kontakt"
         >
           <Mail className="w-6 h-6 text-white" />
-        </button>
+        </Button>
       </div>
     </footer>
   );
