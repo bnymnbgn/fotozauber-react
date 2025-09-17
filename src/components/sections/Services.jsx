@@ -144,16 +144,24 @@ const Services = () => {
         {/* NUR FÜR MOBILE GERÄTE: Swiper mit "cards"-Effekt */}
         <div className="md:hidden">
           <CustomSwiper
-            variant="cards"
             items={services}
-            // ✅ HIER IST DIE LÖSUNG: Die Slide selbst wird zur sichtbaren Karte
-            slideClassName="bg-white rounded-2xl shadow-xl overflow-hidden"
             renderSlide={renderServiceCardContent}
-            effect="cards"
-            className="w-full pb-2"
+            effect="slide" // Effekt auf 'slide' geändert
+            slideClassName="bg-white rounded-2xl shadow-xl overflow-hidden h-full"
             swiperProps={{
+              slidesPerView: 1.2,
+              spaceBetween: 16,
+              centeredSlides: true,
+              loop: true,
               style: {
-                paddingBottom: "50px",
+                paddingBottom: "50px", // Platz für Pagination
+              },
+              breakpoints: {
+                // Responsive Anpassungen für etwas größere mobile Geräte
+                640: {
+                  slidesPerView: 2.2,
+                  spaceBetween: 20,
+                },
               },
             }}
           />
@@ -165,23 +173,19 @@ const Services = () => {
             <ServiceCard key={service.id} service={service} index={index} />
           ))}
         </div>
+      </div>
 
-        {/* Call to Action (unverändert) */}
-        <div className="text-center mt-16">
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 md:p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-4 left-4 w-8 h-8 border-2 border-white rounded-full"></div>
-              <div className="absolute top-8 right-12 w-4 h-4 bg-white rounded-full"></div>
-              <div className="absolute bottom-6 left-16 w-6 h-6 border-2 border-white rotate-45"></div>
-              <div className="absolute bottom-4 right-4 w-10 h-10 border-2 border-white rounded-full"></div>
-            </div>
+      {/* Call to Action - JETZT MIT VOLLER BREITE */}
+      <section className="bg-gradient-to-r from-purple-600 to-pink-600 mt-16">
+        <div className="container text-center">
+          <div className="p-8 md:p-12 text-white relative overflow-hidden">
             <div className="relative z-10">
               <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Bereit für die Transformation?
+                Starten Sie Ihre Transformation
               </h3>
               <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-                Lassen Sie uns gemeinsam magische Momente erschaffen, die ein
-                Leben lang in Erinnerung bleiben.
+                Laden Sie Ihr Bild hoch und erleben Sie die Magie unserer
+                Bearbeitung
               </p>
               <button
                 className="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg touch-optimized touch-feedback prevent-zoom"
@@ -192,13 +196,13 @@ const Services = () => {
                   }
                 }}
               >
-                Jetzt Anfrage stellen
+                Jetzt unverbindlich anfragen
                 <ArrowRight className="w-5 h-5 ml-2 inline" />
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </section>
   );
 };

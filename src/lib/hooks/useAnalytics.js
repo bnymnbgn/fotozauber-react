@@ -64,8 +64,6 @@ export const useAnalytics = () => {
           anonymize_ip: true,
           send_page_view: false,
         });
-
-        console.log("Google Analytics wurde initialisiert.");
         isGaInitialized = true;
       }
     }
@@ -76,7 +74,6 @@ export const useAnalytics = () => {
         page_path: location.pathname + location.search,
         page_title: document.title,
       });
-      console.log(`Page View gesendet für: ${location.pathname}`);
     }
   }, [location]); // Der Effekt läuft immer wieder, wenn sich die URL ändert
 };

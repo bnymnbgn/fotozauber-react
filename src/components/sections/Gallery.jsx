@@ -231,7 +231,7 @@ const Gallery = memo(() => {
               className={cn(
                 "px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 relative",
                 activeFilter === category.id
-                  ? "bg-gradient-primary text-white shadow-lg"
+                  ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg"
                   : "bg-white text-gray-700 hover:bg-gray-100"
               )}
             >
@@ -245,28 +245,14 @@ const Gallery = memo(() => {
           layout
           className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[250px] w-full"
         >
-          {filteredImages.map((image, index) => {
-            let className = "";
-
-            // Perfektes Layout ohne Gaps - manuelle Positionierung
-            if (index === 0 || index === 5) {
-              className = "row-span-2"; // Hohe Bilder
-            } else if (index === 2 || index === 7) {
-              className = "col-span-2"; // Breite Bilder
-            } else if (index === 10) {
-              className = "col-span-2 row-span-2"; // Großes Quadrat
-            } else if (image.title === "Märchen Portrait") {
-              className = "col-span-2"; // Märchen Portrait breit machen
-            }
-            return (
-              <Card
-                key={image.id}
-                image={image}
-                onSelect={setSelectedId}
-                className={className}
-              />
-            );
-          })}
+          {filteredImages.map((image) => (
+            <Card
+              key={image.id}
+              image={image}
+              onSelect={setSelectedId}
+              className={image.className || ""}
+            />
+          ))}
         </motion.div>
       </div>
 

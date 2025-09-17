@@ -10,7 +10,7 @@ const statsData = [
   {
     id: 1,
     icon: Sparkles,
-    gradient: "from-purple-500 to-pink-500",
+    gradient: "from-purple-600 to-pink-600",
     value: "500+",
     title: "Transformierte Bilder",
     description: "Professionelle Bearbeitung für beeindruckende Ergebnisse.",
@@ -117,16 +117,24 @@ const HoverComparisonSection = memo(() => {
         {/* Stats Section */}
         <div className="md:hidden">
           <CustomSwiper
-            variant="cards"
             items={statsData}
-            // ✅ HIER WIRD DIE GLEICHE LOGIK WIE BEI SERVICES ANGEWENDET
-            slideClassName="bg-white rounded-2xl shadow-xl overflow-hidden"
             renderSlide={renderStatCardContent}
-            effect="cards"
-            className="w-full pb-2"
+            effect="slide" // Der richtige Effekt
+            slideClassName="h-full" // Stellt sicher, dass die Karten die volle Höhe haben
             swiperProps={{
+              slidesPerView: 1,
+              spaceBetween: 16,
+              centeredSlides: true,
+              loop: true,
               style: {
-                paddingBottom: "50px",
+                paddingBottom: "50px", // Wichtig für die Pagination
+              },
+              breakpoints: {
+                // Responsive Anpassung für größere Handy-Bildschirme
+                640: {
+                  slidesPerView: 2.5,
+                  spaceBetween: 20,
+                },
               },
             }}
           />
@@ -136,30 +144,6 @@ const HoverComparisonSection = memo(() => {
           {statsData.map((stat) => (
             <StatCard key={stat.id} stat={stat} />
           ))}
-        </div>
-
-        {/* ... (CTA und Modal bleiben unverändert) ... */}
-        <div className="text-center mt-16">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Starten Sie Ihre Transformation
-          </h3>
-          <p className="text-gray-600 mb-6 max-w-xl mx-auto">
-            Laden Sie Ihr Bild hoch und erleben Sie die Magie unserer
-            Bearbeitung
-          </p>
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => {
-              const element = document.querySelector("#contact");
-              if (element) {
-                element.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-          >
-            <span>Jetzt unverbindlich anfragen</span>
-            <ArrowRight className="ml-2 w-5 h-5" />
-          </Button>
         </div>
       </div>
       <Modal
@@ -188,6 +172,34 @@ const HoverComparisonSection = memo(() => {
           </div>
         )}
       </Modal>
+      {/* Call to Action - JETZT MIT VOLLER BREITE */}
+      <section className="bg-gradient-to-r from-purple-600 to-pink-600 mt-16">
+        <div className="container text-center">
+          <div className="p-8 md:p-12 text-white relative overflow-hidden">
+            <div className="relative z-10">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                Bereit für die Transformation?
+              </h3>
+              <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+                Lassen Sie uns gemeinsam magische Momente erschaffen, die ein
+                Leben lang in Erinnerung bleiben.
+              </p>
+              <button
+                className="bg-white text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg touch-optimized touch-feedback prevent-zoom"
+                onClick={() => {
+                  const element = document.querySelector("#contact");
+                  if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
+                Jetzt Anfrage stellen
+                <ArrowRight className="w-5 h-5 ml-2 inline" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
     </section>
   );
 });

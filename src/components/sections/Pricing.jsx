@@ -556,6 +556,13 @@ const Pricing = () => {
               <p className="text-white/80 text-sm">
                 Kostenlose Beratung • Keine Vorabkosten
               </p>
+              {/* HIER DEN LINK EINFÜGEN, nach dem Grid */}
+              <button className="bg-white text-purple-600 hover:bg-gray-100 font-bold py-1 px-1 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                <Link to="/pricing" className="bg-white text-purple-600">
+                  Alle Pakete im Detail vergleichen{" "}
+                  <ArrowRight className="inline w-4 h-4" />
+                </Link>
+              </button>
             </div>
           </div>
         </div>

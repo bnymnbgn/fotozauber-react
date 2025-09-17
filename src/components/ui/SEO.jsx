@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 
 const SEO = ({
-  title = "Noha Studio - Magische Kinderfotografie & Bildbearbeitung",
-  description = "Professionelle Kinderfotografie und magische Bildbearbeitung. Wir verwandeln Ihre Erinnerungen in einzigartige Kunstwerke mit kreativer Fantasiefotografie.",
-  keywords = "Kinderfotografie, Bildbearbeitung, Fantasiefotografie, Familienfotos, Babyfotografie, magische Transformationen, Noha Studio",
+  title = "Noha Studio - Magische Bildbearbeitung & Digitale Kunst",
+  description = "Professionelle Kunst und magische Bildbearbeitung. Wir verwandeln Ihre Erinnerungen in einzigartige Kunstwerke mit kreativer Fantasiefotografie.",
+  keywords = "Bildbearbeitung, Fantasiefotografie, Familienfotos, Babyfotografie, magische Transformationen, Noha Studio",
   canonical = "https://noha-studio.de",
   type = "website",
-  imageUrl = "https://noha-studio.de/og-image.jpg",
+  imageUrl = "https://noha-studio.de/og-image.webp",
 }) => {
   useEffect(() => {
     // Update meta tags dynamically

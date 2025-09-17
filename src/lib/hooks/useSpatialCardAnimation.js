@@ -390,23 +390,18 @@ const useSpatialCardAnimation = (transformationExamples) => {
     const initialize = () => {
       if (!mountedRef.current || !isAnimating) return;
       clearAllTimeouts();
-
-      // NEU: Reset der verwendeten Indices bei Initialisierung
       usedIndicesRef.current.clear();
-
       spatialGridRef.current = new EnhancedSpatialGrid(
         window.innerWidth,
         window.innerHeight
       );
 
       const grid = spatialGridRef.current;
-      const mobileCardCount = 2; // Setzen Sie hier die gewÃ¼nschte maximale Anzahl fÃ¼r Mobile (z.B. 4 oder 6)
-
+      const mobileCardCount = 2;
       const numCardsToShow = grid.isMobile
-        ? Math.min(mobileCardCount, transformationExamples.length) // Nimm maximal 2 Karten, aber nicht mehr als vorhanden
-        : Math.min(6, transformationExamples.length); // Begrenze Desktop auf 6 Karten
+        ? Math.min(mobileCardCount, transformationExamples.length)
+        : Math.min(6, transformationExamples.length);
 
-      // NEU: Erstelle Karten mit zufälligen Indices statt sequenzieller
       const initialCards = [];
       for (let i = 0; i < numCardsToShow; i++) {
         const randomIndex = getNewRandomIndex();
@@ -425,12 +420,20 @@ const useSpatialCardAnimation = (transformationExamples) => {
       initialize();
     }
 
-    const handleResize = () => initialize();
+    // --- HIER IST DIE MAGIE ---
+    let resizeTimeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      // Warte 250ms nach der letzten Größenänderung, bevor neu initialisiert wird
+      resizeTimeout = setTimeout(() => initialize(), 250);
+    };
+
     window.addEventListener("resize", handleResize);
 
     return () => {
       mountedRef.current = false;
       window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimeout); // Wichtig: Timeout beim Verlassen der Komponente löschen
       spatialGridRef.current?.clear();
       clearAllTimeouts();
     };

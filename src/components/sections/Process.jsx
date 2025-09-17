@@ -446,65 +446,75 @@ const Process = () => {
             })}
           </div>
         </motion.div>
-
-        <motion.div
-          className="text-center bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-8 md:p-12 text-white mt-16 max-w-6xl mx-auto"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        >
-          <motion.h3
-            className="text-2xl md:text-3xl font-bold mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
+      </div>
+      {/* Call to Action - JETZT MIT VOLLER BREITE */}
+      <section className="mt-16 bg-gradient-to-r from-purple-600 to-pink-600">
+        <div className="container">
+          <motion.div
+            className="text-center rounded-3xl p-8 md:p-12 text-white"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            Bereit für den ersten Schritt?
-          </motion.h3>
-          <motion.p
-            className="text-lg text-white/90 mb-8 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.4 }}
-          >
-            Starten Sie noch heute Ihre magische Transformation. Der Upload
-            Ihrer Bilder dauert nur wenige Minuten.
-          </motion.p>
-          <motion.button
-            className="bg-white text-purple-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-full transition-colors duration-300 shadow-lg"
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2)",
-            }}
-            whileTap={{ scale: 0.98 }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 20,
-              delay: 0.6,
-            }}
-          >
-            Jetzt Bilder hochladen
-            <motion.div
-              className="inline-block ml-2"
-              animate={{ x: [0, 4, 0] }}
+            <motion.h3
+              className="text-2xl md:text-3xl font-bold mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              Bereit für den ersten Schritt?
+            </motion.h3>
+            <motion.p
+              className="text-lg text-white/90 mb-8 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+            >
+              Starten Sie noch heute Ihre magische Transformation. Der Upload
+              Ihrer Bilder dauert nur wenige Minuten.
+            </motion.p>
+            <motion.button
+              className="bg-white text-purple-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-full transition-colors duration-300 shadow-lg"
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2)",
+              }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut",
+                type: "spring",
+                stiffness: 300,
+                damping: 20,
+                delay: 0.6,
+              }}
+              onClick={() => {
+                const element = document.querySelector("#contact");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
               }}
             >
-              <ArrowRight className="w-5 h-5" />
-            </motion.div>
-          </motion.button>
-        </motion.div>
-      </div>
+              Jetzt Bilder hochladen
+              <motion.div
+                className="inline-block ml-2"
+                animate={{ x: [0, 4, 0] }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                <ArrowRight className="w-5 h-5" />
+              </motion.div>
+            </motion.button>
+          </motion.div>
+        </div>
+      </section>
     </section>
   );
 };

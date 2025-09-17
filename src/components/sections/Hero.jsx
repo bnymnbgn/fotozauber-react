@@ -210,7 +210,7 @@ const Hero = memo(() => {
           transition={{ duration: prefersReducedMotion ? 0 : 1, delay: 0.5 }}
         >
           <div className="inline-flex items-center px-4 py-2 mb-6 space-x-2 text-sm text-white/90 bg-white/10 border border-white/20 rounded-full backdrop-blur-sm">
-            <span>FOTOGRAFIE TRIFFT FANTASIE</span>
+            <span>DEIN BILD. UNSERE MAGIE.</span>
           </div>
 
           <div className="aurora-logo-container animated-gradient-text bg-gradient-to-bl from-fuchsia-500 via-violet-600 to-blue-400"></div>

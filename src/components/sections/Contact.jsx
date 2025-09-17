@@ -157,7 +157,7 @@ const Contact = () => {
             {/* Kontakt-Karten */}
             <div className="space-y-4">
               <div className="flex items-center space-x-4 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
                   <Phone className="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -188,7 +188,7 @@ const Contact = () => {
             </div>
 
             {/* Arbeitszeiten */}
-            <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-6 text-white">
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-6 text-white">
               <div className="flex items-center space-x-2 mb-4">
                 <Clock className="w-5 h-5" />
                 <h4 className="font-semibold">Arbeitszeiten</h4>

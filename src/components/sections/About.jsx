@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import profilBild from "../../assets/about.webp";
 import CustomSwiper from "../ui/CustomSwiper"; // Die wiederverwendbare Komponente
+import { testimonials } from "../../data/content";
 
 const achievements = [
   {
@@ -43,36 +44,12 @@ const achievements = [
   },
 ];
 
-const testimonials = [
-  {
-    id: 1,
-    text: "Die Transformation der Bilder unserer Tochter war einfach magisch. Sie sieht sich jetzt als echte Prinzessin!",
-    author: "Sarah Martinez",
-    role: "Mutter von Emma (5 Jahre)",
-    rating: 5,
-  },
-  {
-    id: 2,
-    text: "Professionell, kreativ und herzlich. Noha hat unsere Erwartungen bei weitem übertroffen. Absolute Empfehlung!",
-    author: "Michael Weber",
-    role: "Vater von Leon (7 Jahre)",
-    rating: 5,
-  },
-  {
-    id: 3,
-    text: "Die Qualität und Liebe zum Detail ist unglaublich. Unsere Kinder sind begeistert von ihren Superhelden-Fotos!",
-    author: "Lisa Hoffmann",
-    role: "Mutter von Tim & Anna",
-    rating: 5,
-  },
-];
-
 // Render-Funktion für eine Achievement-Karte
 const renderAchievementCard = (achievement) => {
   const IconComponent = achievement.icon;
   return (
     <div className="text-center p-6">
-      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+      <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
         <IconComponent className="w-8 h-8 text-white" />
       </div>
       <h3 className="text-3xl font-bold text-gray-900 mb-2">
@@ -230,49 +207,43 @@ const About = () => {
 
         {/* Achievements */}
         <div className="mb-20">
-          <div className="md:hidden px-4">
-            <div className="relative w-full max-w-[320px] mx-auto">
-              <CustomSwiper
-                variant="cards"
-                items={achievements}
-                renderSlide={renderAchievementCard}
-                effect="cards"
-                slideClassName="flex items-center justify-center rounded-2xl bg-white shadow-xl"
-                className="w-full pb-2"
-                swiperProps={{
-                  style: {
-                    paddingBottom: "50px",
+          <div className="md:hidden">
+            <CustomSwiper
+              items={achievements}
+              renderSlide={renderAchievementCard}
+              effect="slide" // Effekt auf 'slide' geändert
+              slideClassName="h-full" // Höhe füllen lassen
+              swiperProps={{
+                slidesPerView: 1, // Mehrere Slides gleichzeitig
+                spaceBetween: 16,
+                centeredSlides: true,
+                loop: true,
+                style: {
+                  paddingBottom: "50px", // Platz für Pagination
+                },
+                breakpoints: {
+                  // Responsive Anpassungen
+                  640: {
+                    slidesPerView: 2.5,
+                    spaceBetween: 20,
                   },
-                }}
-              />
-            </div>
+                },
+              }}
+            />
           </div>
           <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {achievements.map((achievement) => {
-              const IconComponent = achievement.icon;
-              return (
-                <div
-                  key={achievement.id}
-                  className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                >
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <IconComponent className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">
-                    {achievement.number}
-                  </h3>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                    {achievement.label}
-                  </h4>
-                  <p className="text-sm text-gray-600">
-                    {achievement.description}
-                  </p>
-                </div>
-              );
-            })}
+            {achievements.map((achievement) => (
+              <div
+                key={achievement.id}
+                className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+              >
+                {renderAchievementCard(achievement)}
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* --- VERBESSERTER TESTIMONIALS SLIDER --- */}
         <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl py-12 md:py-20 text-white">
           <div className="text-center mb-12 px-4">
             <h3 className="text-3xl md:text-4xl font-bold mb-4">
@@ -287,10 +258,23 @@ const About = () => {
             variant="testimonials"
             items={testimonials}
             renderSlide={renderTestimonialCard}
-            effect="coverflow"
+            effect="slide" // Effekt auf 'slide' geändert
             swiperProps={{
+              loop: true,
+              centeredSlides: true,
+              slidesPerView: 1, // Immer nur ein Testimonial im Fokus
+              spaceBetween: 30,
               style: {
                 paddingBottom: "80px",
+              },
+              breakpoints: {
+                // Auf größeren Screens mehr Kontext zeigen
+                768: {
+                  slidesPerView: 2,
+                },
+                1024: {
+                  slidesPerView: 3,
+                },
               },
             }}
           />
