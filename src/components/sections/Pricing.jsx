@@ -442,6 +442,17 @@ const Pricing = () => {
           </div>
         </div>
 
+        {/* HIER DEN LINK EINFÜGEN, nach dem Grid */}
+        <div className="text-center mt-16">
+          <Link
+            to="/pricing"
+            className="text-lg font-semibold text-purple-600 hover:text-purple-800 transition-colors"
+          >
+            Alle Pakete im Detail vergleichen{" "}
+            <ArrowRight className="inline w-5 h-5" />
+          </Link>
+        </div>
+
         {/* Summary & CTA */}
         <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 md:p-12 text-white">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
