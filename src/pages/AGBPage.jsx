@@ -143,12 +143,15 @@ const AGBPage = () => {
                 </div>
               </div>
               <p className="text-gray-700 leading-relaxed">
-                Der Auftraggeber erhält die uneingeschränkten privaten
-                Nutzungsrechte an den bearbeiteten Bildern. Eine kommerzielle
-                Nutzung bedarf einer gesonderten, schriftlichen Vereinbarung.
-                Der Auftragnehmer darf die Werke für Eigenwerbung (z.B. auf
-                dieser Website) nutzen, es sei denn, der Auftraggeber
-                widerspricht dem schriftlich.
+                Der Auftragnehmer verpflichtet sich zur vertraulichen Behandlung
+                der vom Auftraggeber übermittelten Bilddaten. Eine
+                Veröffentlichung oder Nutzung für Eigenwerbung (z.B. im
+                Portfolio auf dieser Website) erfolgt ausschließlich nach
+                Einholung einer separaten, ausdrücklichen Einwilligung des
+                Auftraggebers. Diese Einwilligungserklärung regelt auch den Grad
+                der Anonymisierung der Bilder. Liegt keine Einwilligung vor,
+                werden die Bilder streng vertraulich behandelt und nicht
+                veröffentlicht.
               </p>
             </div>
 

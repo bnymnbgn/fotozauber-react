@@ -14,6 +14,8 @@ import {
   Shield,
   Clock,
 } from "lucide-react";
+import FontSizeControl from "../ui/FontSizeControl";
+import Button from "../ui/Button";
 
 const Footer = () => {
   const navigate = useNavigate(); // 2. useNavigate hook
@@ -53,7 +55,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-purple-900 to-pink-900 text-white relative overflow-hidden">
+    <footer className="bg-gradient-to-br from-gray-900 via-purple-900 to-indigo-900 text-white relative overflow-hidden">
       {/* Hintergrund-Dekoration */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-20 w-40 h-40 bg-purple-400 rounded-full blur-3xl"></div>
@@ -68,7 +70,7 @@ const Footer = () => {
           <div className="lg:col-span-2">
             <div className="mb-6">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold">NOHA STUDIO</h3>
@@ -109,7 +111,7 @@ const Footer = () => {
               </h4>
               <div className="flex space-x-4">
                 <a
-                  href="https://instagram.com/noha.studio"
+                  href="https://instagram.com/nohastudio.de"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -117,7 +119,7 @@ const Footer = () => {
                   <Instagram className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://facebook.com/noha.studio"
+                  href="https://facebook.com/nohastudio.de"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110"
@@ -238,7 +240,7 @@ const Footer = () => {
             {/* Back to Top Button */}
             <button
               onClick={scrollToTop}
-              className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 shadow-lg"
+              className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-600 hover:to-pink-600 rounded-xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 shadow-lg"
               aria-label="Nach oben scrollen"
             >
               <ArrowUp className="w-5 h-5 text-white" />
@@ -251,7 +253,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-8 text-center">
             <div className="flex items-center space-x-2 text-gray-300">
               <Shield className="w-4 h-4 text-green-400" />
-              <span className="text-sm">100% sichere Datenübertragung</span>
+              <span className="text-sm">100% Anonym & Sicher</span>
             </div>
 
             <div className="flex items-center space-x-2 text-gray-300">
@@ -261,7 +263,17 @@ const Footer = () => {
 
             <div className="flex items-center space-x-2 text-gray-300">
               <Sparkles className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm">500+ magische Transformationen</span>
+              <span className="text-sm">100% Maßgeschneidert</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Font Size Control */}
+        <div className="py-4 border-t border-white/10">
+          <div className="flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <span className="text-gray-300 text-sm">Schriftgröße:</span>
+              <FontSizeControl />
             </div>
           </div>
         </div>
@@ -269,13 +281,14 @@ const Footer = () => {
 
       {/* Floating Action Button für Kontakt */}
       <div className="fixed bottom-6 right-6 z-50">
-        <button
+        <Button
+          variant="primary"
+          size="icon"
           onClick={() => handleLinkClick("#contact")}
-          className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 animate-pulse"
           aria-label="Kontakt"
         >
           <Mail className="w-6 h-6 text-white" />
-        </button>
+        </Button>
       </div>
     </footer>
   );

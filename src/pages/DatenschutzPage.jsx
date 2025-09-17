@@ -4,6 +4,7 @@ import {
   User,
   Database,
   Cookie,
+  BarChart,
   Mail,
   Users,
   ExternalLink,
@@ -170,29 +171,105 @@ const DatenschutzPage = () => {
               </p>
             </div>
 
-            {/* Ihre Rechte */}
+            {/* Webanalyse mit Google Analytics */}
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
               <div className="flex items-start space-x-4 mb-4">
-                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center">
-                  <Users className="w-5 h-5 sm:w-6 sm:h-6text-white" />
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center">
+                  <BarChart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 mb-1">
-                    Ihre Rechte
+                    Webanalyse mit Google Analytics
                   </h2>
                   <p className="text-sm text-gray-500">
-                    Welche Rechte haben Sie bezüglich Ihrer Daten?
+                    Wie wir die Nutzung unserer Website analysieren.
                   </p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">
-                Sie haben das Recht auf Auskunft über Ihre gespeicherten Daten
-                (Art. 15 DSGVO), auf Berichtigung (Art. 16 DSGVO), Löschung
-                (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO),
-                Datenübertragbarkeit (Art. 20 DSGVO) und Widerspruch gegen die
-                Verarbeitung (Art. 21 DSGVO). Wenden Sie sich hierfür an:
-                info@noha-studio.de.
-              </p>
+              <div className="space-y-4 text-gray-700 leading-relaxed">
+                <p>
+                  Diese Website nutzt Funktionen des Webanalysedienstes Google
+                  Analytics. Anbieter ist die Google Ireland Limited („Google“),
+                  Gordon House, Barrow Street, Dublin 4, Irland.
+                </p>
+                <p>
+                  Die Nutzung dieses Analyse-Tools erfolgt ausschließlich auf
+                  Grundlage Ihrer ausdrücklichen Einwilligung nach Art. 6 Abs. 1
+                  lit. a DSGVO, die Sie über unser Cookie-Banner erteilen. Diese
+                  Einwilligung ist jederzeit widerrufbar.
+                </p>
+                <p>
+                  Die Speicherung von Google-Analytics-Cookies und die Nutzung
+                  dieses Analyse-Tools erfolgen nur auf Grundlage Ihrer
+                  ausdrücklichen Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO,
+                  die Sie über unser Cookie-Banner erteilen. Diese Einwilligung
+                  ist jederzeit widerrufbar.
+                </p>
+
+                <h3 className="font-semibold text-gray-800 pt-2">
+                  IP-Anonymisierung
+                </h3>
+                <p>
+                  Wir haben auf dieser Website die Funktion IP-Anonymisierung
+                  aktiviert. Dadurch wird Ihre IP-Adresse von Google innerhalb
+                  von Mitgliedstaaten der Europäischen Union oder in anderen
+                  Vertragsstaaten des Abkommens über den Europäischen
+                  Wirtschaftsraum vor der Übermittlung in die USA gekürzt. Nur
+                  in Ausnahmefällen wird die volle IP-Adresse an einen Server
+                  von Google in den USA übertragen und dort gekürzt.
+                </p>
+
+                <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded-r-lg">
+                  <h4 className="font-semibold text-gray-800">
+                    Was bedeutet "Ausnahmefall"?
+                  </h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Dieser juristische Standardsatz beschreibt seltene
+                    technische Störfälle (z.B. den kurzzeitigen Ausfall eines
+                    europäischen Servers). Es handelt sich hierbei nicht um eine
+                    Regelung, die eine Umgehung der Anonymisierung erlaubt. Wir
+                    haben technisch alles unsererseits Erforderliche getan, um
+                    die Kürzung Ihrer IP-Adresse sicherzustellen.
+                  </p>
+                </div>
+
+                <h3 className="font-semibold text-gray-800 pt-2">
+                  Widerspruch gegen Datenerfassung
+                </h3>
+                <p>
+                  Sie können die Erfassung Ihrer Daten durch Google Analytics
+                  generell verhindern, indem Sie das unter dem folgenden Link
+                  verfügbare Browser-Plugin herunterladen und installieren:{" "}
+                  <a
+                    href="https://tools.google.com/dlpage/gaoptout?hl=de"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-purple-600 underline hover:text-purple-800"
+                  >
+                    https://tools.google.com/dlpage/gaoptout?hl=de
+                  </a>
+                  .
+                </p>
+
+                <h3 className="font-semibold text-gray-800 pt-2">
+                  Speicherdauer
+                </h3>
+                <p>
+                  Bei Google gespeicherte Daten auf Nutzer- und Ereignisebene,
+                  die mit Cookies, Nutzerkennungen (z. B. User ID) oder
+                  Werbe-IDs verknüpft sind, werden in der Regel nach 14 Monaten
+                  anonymisiert bzw. gelöscht. Details hierzu ersehen Sie unter
+                  folgendem Link:{" "}
+                  <a
+                    href="https://support.google.com/analytics/answer/7667196?hl=de"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-purple-600 underline hover:text-purple-800"
+                  >
+                    https://support.google.com/analytics/answer/7667196?hl=de
+                  </a>
+                </p>
+              </div>
             </div>
 
             {/* Server-Logfiles */}
@@ -228,24 +305,36 @@ const DatenschutzPage = () => {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 mb-1">
-                    Cookies
+                    Cookies & Einwilligung
                   </h2>
                   <p className="text-sm text-gray-500">
-                    Nutzung von Cookies auf unserer Seite
+                    Wie wir Cookies auf unserer Seite nutzen
                   </p>
                 </div>
               </div>
-              <p className="text-gray-700 leading-relaxed">
-                Unsere Internetseiten verwenden so genannte „Cookies“. Cookies
-                sind kleine Textdateien und richten auf Ihrem Endgerät keinen
-                Schaden an. Sie dienen dazu, unser Angebot nutzerfreundlicher,
-                effektiver und sicherer zu machen. Wir verwenden ausschließlich
-                technisch notwendige Cookies (z. B. für die Funktionalität der
-                Website), die keiner Einwilligung bedürfen (Art. 6 Abs. 1 lit. f
-                DSGVO). Sie können Ihren Browser so einstellen, dass Sie über
-                das Setzen von Cookies informiert werden und Cookies nur im
-                Einzelfall erlauben.
-              </p>
+              <div className="space-y-4 text-gray-700 leading-relaxed">
+                <p>
+                  Unsere Website verwendet Cookies. Dies sind kleine
+                  Textdateien, die Ihr Webbrowser auf Ihrem Endgerät speichert.
+                  Wir unterscheiden zwischen technisch notwendigen und
+                  optionalen Cookies.
+                </p>
+                <p>
+                  <strong>Technisch notwendige Cookies</strong> sind für die
+                  Grundfunktionen unserer Website unerlässlich. Der Einsatz
+                  dieser Cookies erfolgt auf Grundlage unseres berechtigten
+                  Interesses (Art. 6 Abs. 1 lit. f DSGVO) an einem
+                  nutzerfreundlichen und funktionsfähigen Online-Angebot.
+                </p>
+                <p>
+                  <strong>Optionale Cookies</strong> (z.B. für Analyse,
+                  Marketing oder funktionale Zwecke) werden nur nach Ihrer
+                  ausdrücklichen Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)
+                  gesetzt. Diese Einwilligung holen wir über unser Cookie-Banner
+                  ein. Sie können Ihre Auswahl dort jederzeit anpassen oder
+                  widerrufen.
+                </p>
+              </div>
             </div>
 
             {/* Drittanbieter */}
@@ -256,21 +345,53 @@ const DatenschutzPage = () => {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-gray-900 mb-1">
-                    Drittanbieter
+                    Drittanbieter & Datenübermittlung
                   </h2>
                   <p className="text-sm text-gray-500">
-                    Verwendung von externen Diensten
+                    Einsatz externer Dienste
                   </p>
                 </div>
               </div>
               <p className="text-gray-700 leading-relaxed">
-                Wir nutzen keine Drittanbieter-Dienste wie Analyse-Tools oder
-                Social-Media-Plugins, die Ihre Daten erfassen könnten. Sollten
-                in Zukunft solche Dienste eingesetzt werden, werden wir Sie
-                hierüber informieren und gegebenenfalls Ihre Einwilligung
-                einholen.
+                Wir setzen auf unserer Webseite Dienste von Drittanbietern ein,
+                um unser Angebot zu analysieren und zu verbessern. Der Einsatz
+                dieser Dienste erfolgt ausschließlich auf Grundlage Ihrer
+                ausdrücklichen Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die
+                Sie über unser Cookie-Banner erteilen. Aktuell betrifft dies den
+                Webanalysedienst Google Analytics (Anbieter: Google Ireland
+                Limited). Wenn Sie der Nutzung von Analyse-Cookies zustimmen,
+                können Daten (z.B. Ihre anonymisierte IP-Adresse und
+                Nutzungsdaten) an Server von Google in den USA übermittelt
+                werden. Wir geben darüber hinaus keine personenbezogenen Daten
+                ohne Ihre explizite Zustimmung an Dritte weiter, es sei denn,
+                wir sind gesetzlich dazu verpflichtet.
               </p>
             </div>
+          </div>
+
+          {/* Ihre Rechte */}
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100">
+            <div className="flex items-start space-x-4 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-1">
+                  Ihre Rechte
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Welche Rechte haben Sie bezüglich Ihrer Daten?
+                </p>
+              </div>
+            </div>
+            <p className="text-gray-700 leading-relaxed">
+              Sie haben das Recht auf Auskunft über Ihre gespeicherten Daten
+              (Art. 15 DSGVO), auf Berichtigung (Art. 16 DSGVO), Löschung (Art.
+              17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO),
+              Datenübertragbarkeit (Art. 20 DSGVO) und Widerspruch gegen die
+              Verarbeitung (Art. 21 DSGVO). Wenden Sie sich hierfür an:
+              info@noha-studio.de.
+            </p>
           </div>
 
           {/* Footer Hinweis */}
